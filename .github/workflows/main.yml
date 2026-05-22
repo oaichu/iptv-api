@@ -40,7 +40,7 @@ jobs:
       - name: Update IPTV playlist
         run: pipenv run dev
 
-      - name: Post-process M3U (Bộ Lọc Tuyệt Đối: Giữ đúng nhóm, đúng thứ tự, xóa kênh thừa)
+      - name: Post-process M3U Filter
         run: |
           if [ ! -f output/user_result.m3u ]; then
             echo "LỖI: Không tìm thấy output/user_result.m3u"
@@ -50,10 +50,8 @@ jobs:
           python3 <<'PY'
           from pathlib import Path
           import re
-          from collections import OrderedDict
 
           def clean_name(text):
-              # Làm sạch tên thông minh để so khớp (bỏ chữ HD, 4K, giữ lại +, -)
               t = text.lower()
               t = re.sub(r'[\(\[].*?[\)\]]', '', t)
               t = re.sub(r'(?i)\b(fhd|hd|sd|4k|1080p|720p|2k)\b', '', t)
@@ -61,9 +59,6 @@ jobs:
               t = re.sub(r'\s+', ' ', t).strip()
               return t
 
-          # =====================================================================
-          # 1. ĐỌC FILE DEMO ĐỂ LẤY THỨ TỰ NHÓM (ORDERED GROUPS) VÀ DANH SÁCH KÊNH
-          # =====================================================================
           ordered_groups = []
           group_map = {}
           demo_path = Path("config/user_demo.txt")
@@ -83,18 +78,13 @@ jobs:
                           if norm and norm not in group_map:
                               group_map[norm] = current_group
 
-          # Sắp xếp từ khóa Demo dài check trước, ngắn check sau (VD: VTV5 Tây Nam Bộ check trước VTV5)
           sorted_keywords = sorted(group_map.keys(), key=len, reverse=True)
 
-          # =====================================================================
-          # 2. XỬ LÝ FILE RAW M3U TỪ TOOL TRUNG QUỐC
-          # =====================================================================
           path = Path("output/user_result.m3u")
           text = path.read_text(encoding="utf-8", errors="ignore")
-          text = text.replace("$订阅源", "") # Xóa chữ Tàu mặc định
+          text = text.replace("$订阅源", "")
           lines = text.splitlines()
 
-          # Tạo từ điển chứa kết quả xuất ra theo đúng thứ tự mảng ordered_groups
           grouped_output = {grp: [] for grp in ordered_groups}
           seen_urls = set()
 
@@ -110,12 +100,10 @@ jobs:
               else:
                   if current_extinf:
                       url = line
-                      # Bỏ qua dòng chữ thông báo cập nhật của TQ
                       if "更新时间" in current_extinf or "Thời Gian Cập Nhật" in current_extinf:
                           current_extinf = None
                           continue
 
-                      # Tránh trùng lặp link y hệt nhau
                       if url in seen_urls:
                           current_extinf = None
                           continue
@@ -123,12 +111,10 @@ jobs:
                       parts = current_extinf.split(",")
                       raw_channel_name = parts[-1].strip() if len(parts) > 1 else ""
                       
-                      # Fix lỗi hiển thị dải ngày giờ
                       if re.match(r'^\d{4}-\d{2}-\d{2}', raw_channel_name):
                           match_id = re.search(r'tvg-id="([^"]*)"', current_extinf)
                           raw_channel_name = match_id.group(1) if match_id else raw_channel_name
                       
-                      # Cạo sạch chữ Trung Quốc ở tên hiển thị
                       display_name = re.sub(r'[\u4e00-\u9fff]', '', raw_channel_name)
                       display_name = re.sub(r'\(\s*\)', '', display_name)
                       display_name = re.sub(r'^[-_|\s]+|[-_|\s]+$', '', display_name).strip()
@@ -136,36 +122,27 @@ jobs:
                           
                       norm_m3u = clean_name(display_name)
                       
-                      # TIẾN HÀNH KHỚP KÊNH THEO DEMO (LOGIC CHẶT CHẼ)
                       matched_group = None
                       for kw in sorted_keywords:
-                          # Khớp nếu trùng hoàn toàn, hoặc bắt đầu bằng cụm đó, hoặc nằm trọn vẹn dưới dạng 1 từ
                           if norm_m3u == kw or norm_m3u.startswith(kw + " ") or norm_m3u.startswith(kw + "-") or f" {kw} " in f" {norm_m3u} ":
                               matched_group = group_map[kw]
                               break
                       
-                      # 🔴 LOGIC THANH TRỪNG: Nếu kênh KHÔNG thuôc nhóm nào trong Demo => BỎ QUA LUÔN (KHÔNG LƯU)
                       if matched_group:
                           seen_urls.add(url)
                           base_info = parts[0]
-                          # Ép lại Group-Title cho chuẩn
                           if 'group-title="' in base_info:
                               base_info = re.sub(r'group-title="[^"]*"', f'group-title="{matched_group}"', base_info)
                           else:
                               base_info = base_info.replace("#EXTINF:-1", f'#EXTINF:-1 group-title="{matched_group}"', 1)
                           
-                          # Đưa kênh vào đúng rổ nhóm của nó trong Memory
                           grouped_output[matched_group].append((f"{base_info},{display_name}", url))
                       
                       current_extinf = None
 
-          # =====================================================================
-          # 3. GHI FILE M3U THEO ĐÚNG THỨ TỰ NHÓM CỦA DEMO
-          # =====================================================================
           output_lines = ['#EXTM3U']
           total_channels = 0
 
-          # Duyệt qua mảng ordered_groups để đảm bảo VTV xuất hiện trước, HTV thứ 2, ...
           for grp in ordered_groups:
               for extinf, url in grouped_output[grp]:
                   output_lines.append(extinf)
@@ -175,12 +152,12 @@ jobs:
           path.write_text("\n".join(output_lines) + "\n", encoding="utf-8")
 
           print(f"\n{'='*60}")
-          print(f"✅ TỔNG SỐ KÊNH SỐNG THU ĐƯỢC: {total_channels}")
+          print(f"✅ TONG SO KENH SONG THU DUOC: {total_channels}")
           print(f"{'='*60}")
-          print("THỨ TỰ HIỂN THỊ CÁC NHÓM TRÊN APP (Chuẩn 100% theo Demo):")
+          print("THU TU HIEN THI CAC NHOM:")
           for idx, grp in enumerate(ordered_groups, 1):
               count = len(grouped_output[grp])
-              print(f"  {idx:02d}. [{count:>4} kênh] - {grp}")
+              print(f"  {idx:02d}. [{count:>4} kenh] - {grp}")
           print(f"{'='*60}\n")
           PY
 
@@ -190,6 +167,6 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git add .
           if ! git diff --staged --quiet; then
-            git commit -m "STRICT LOGIC: Enforce Demo order, delete unlisted channels, optimize matching"
+            git commit -m "Fixed YAML Syntax Error and enforced demo logic"
             git push --force
           fi
