@@ -1,4 +1,4 @@
-      - name: Post-process M3U Filter
+       name: Post-process M3U Filter
         run: |
           if [ ! -f output/user_result.m3u ]; then
             echo "LỖI: Không tìm thấy output/user_result.m3u"
