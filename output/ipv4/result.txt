@@ -1,6 +1,22 @@
 VTV - Kênh Quốc Gia,#genre#
+VTV2,https://live.fptplay53.net/fnxch2/vtv2hd_abr.smil/chunklist.m3u8
+VTV2 HD,https://live.fptplay53.net/fnxch2/vtv2hd_abr.smil/chunklist.m3u8
+VTV3,https://live.fptplay53.net/fnxch2/vtv3hd_abr.smil/chunklist.m3u8
+VTV3 HD,https://live.fptplay53.net/fnxch2/vtv3hd_abr.smil/chunklist.m3u8
+VTV7,https://live.fptplay53.net/fnxhd1/vtv7hd_vhls.smil/chunklist.m3u8
+VTV7 HD,https://live.fptplay53.net/fnxhd1/vtv7hd_vhls.smil/chunklist.m3u8
+VTV8,https://live.fptplay53.net/epzhd1/vtv8hd_vhls.smil/chunklist.m3u8
+VTV8 HD,https://live.fptplay53.net/epzhd1/vtv8hd_vhls.smil/chunklist.m3u8
+VTV9,https://live.fptplay53.net/fnxhd1/vtv9_vhls.smil/chunklist.m3u8
+VTV9 HD,https://live.fptplay53.net/fnxhd1/vtv9_vhls.smil/chunklist.m3u8
 
 HTV - TP Hồ Chí Minh,#genre#
+HTV3,https://vc.101vn.com/htv/htvcmb.php?id=2535
+HTV7,https://liveh12.vtvprime.vn/hls/HTV7HD/index.m3u8
+HTV7 HD,https://liveh12.vtvprime.vn/hls/HTV7HD/index.m3u8
+HTV9,https://live.fptplay53.net/epzhd1/htv9hd_vhls.smil/chunklist.m3u8
+HTV9 HD,https://live.fptplay53.net/epzhd1/htv9hd_vhls.smil/chunklist.m3u8
+HTV Thể Thao,https://live.fptplay53.net/epzhd1/htvcthethao_vhls.smil/chunklist.m3u8
 
 Địa Phương - Miền Bắc,#genre#
 
@@ -17,6 +33,8 @@ K Plus,#genre#
 FPT Play,#genre#
 
 Tin Tức - Thời Sự VN,#genre#
+ANTV,https://live.fptplay53.net/fnxhd2/anninhtv_vhls.smil/chunklist.m3u8
+QPVN,https://liveh12.vtvprime.vn/hls/QPTV/index.m3u8
 
 Tin Tức Quốc Tế,#genre#
 
@@ -25,6 +43,7 @@ Thể Thao Việt Nam,#genre#
 Thể Thao Quốc Tế,#genre#
 
 Phim Truyện,#genre#
+Channel 5,https://app.viloud.tv/hls/channel/dcbf7a54c89ba12d98cc7c401c37f565.m3u8
 
 Thiếu Nhi,#genre#
 

@@ -1,14 +1,14 @@
 # === NGUỒN IPTV VIỆT NAM CHẤT LƯỢNG CAO ===
-https://raw.githubusercontent.com/iptv-org/iptv/master/streams/vn.m3u
-https://raw.githubusercontent.com/blacktobia/iptv/main/vietnam.m3u
-https://raw.githubusercontent.com/taylordale/IPTV/master/Vietnam.m3u
-https://raw.githubusercontent.com/iamthanhcsg/IPTV/master/VietNam.m3u
-https://raw.githubusercontent.com/luongz/iptv-vn/main/vn.m3u
-https://raw.githubusercontent.com/tvht/iptv/master/vietnam.m3u
-https://raw.githubusercontent.com/thanhphu/iptv/master/vietnam.m3u
-https://raw.githubusercontent.com/haipro287/iptv/master/vietnam.m3u
-
 # === NGUỒN QUỐC TẾ (Vớt thêm CNN, HBO, Thể thao...) ===
+https://raw.githubusercontent.com/iptv-org/iptv/master/streams/vn.m3u
 https://iptv-org.github.io/iptv/index.m3u
 https://raw.githubusercontent.com/fanmingming/live/main/tv/m3u/ipv6.m3u
 https://raw.githubusercontent.com/YueChan/Live/main/IPTV.m3u
+
+# https://raw.githubusercontent.com/blacktobia/iptv/main/vietnam.m3u
+# https://raw.githubusercontent.com/taylordale/IPTV/master/Vietnam.m3u
+# https://raw.githubusercontent.com/iamthanhcsg/IPTV/master/VietNam.m3u
+# https://raw.githubusercontent.com/luongz/iptv-vn/main/vn.m3u
+# https://raw.githubusercontent.com/tvht/iptv/master/vietnam.m3u
+# https://raw.githubusercontent.com/thanhphu/iptv/master/vietnam.m3u
+# https://raw.githubusercontent.com/haipro287/iptv/master/vietnam.m3u
