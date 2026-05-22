@@ -1,33 +1,14 @@
-# ==========================================
-# NGUỒN VIỆT NAM (VTV, HTV, K+, Địa Phương...)
-# ==========================================
-# ==========================================
-# NGUỒN CHÂU Á (CCTV, KBS, NHK, TVB...)
-# ==========================================
-# ==========================================
-# NGUỒN QUỐC TẾ & THỂ THAO & TIN TỨC
-# ==========================================
-# ==========================================
-# NGUỒN IPv6 & TỔNG HỢP CHẤT LƯỢNG CAO
-# ==========================================
-# https://raw.githubusercontent.com/iamthanhcsg/IPTV/master/VietNam.m3u
-# https://raw.githubusercontent.com/blacktobia/iptv/main/vietnam.m3u
-# https://raw.githubusercontent.com/taylordale/IPTV/master/Vietnam.m3u
-https://iptv-org.github.io/iptv/countries/cn.m3u
-https://iptv-org.github.io/iptv/countries/jp.m3u
-https://iptv-org.github.io/iptv/categories/news.m3u
-https://iptv-org.github.io/iptv/categories/sports.m3u
-https://iptv-org.github.io/iptv/categories/movies.m3u
-https://iptv-org.github.io/iptv/categories/entertainment.m3u
+# === NGUỒN IPTV VIỆT NAM CHẤT LƯỢNG CAO ===
+https://raw.githubusercontent.com/iptv-org/iptv/master/streams/vn.m3u
+https://raw.githubusercontent.com/blacktobia/iptv/main/vietnam.m3u
+https://raw.githubusercontent.com/taylordale/IPTV/master/Vietnam.m3u
+https://raw.githubusercontent.com/iamthanhcsg/IPTV/master/VietNam.m3u
+https://raw.githubusercontent.com/luongz/iptv-vn/main/vn.m3u
+https://raw.githubusercontent.com/tvht/iptv/master/vietnam.m3u
+https://raw.githubusercontent.com/thanhphu/iptv/master/vietnam.m3u
+https://raw.githubusercontent.com/haipro287/iptv/master/vietnam.m3u
+
+# === NGUỒN QUỐC TẾ (Vớt thêm CNN, HBO, Thể thao...) ===
+https://iptv-org.github.io/iptv/index.m3u
 https://raw.githubusercontent.com/fanmingming/live/main/tv/m3u/ipv6.m3u
 https://raw.githubusercontent.com/YueChan/Live/main/IPTV.m3u
-
-# https://iptv-org.github.io/iptv/countries/vn.m3u
-# https://raw.githubusercontent.com/iptv-org/iptv/master/streams/vn.m3u
-# https://iptv-org.github.io/iptv/countries/kr.m3u
-# https://iptv-org.github.io/iptv/countries/hk.m3u
-# https://iptv-org.github.io/iptv/countries/tw.m3u
-# https://iptv-org.github.io/iptv/countries/th.m3u
-# https://iptv-org.github.io/iptv/countries/us.m3u
-# https://iptv-org.github.io/iptv/countries/gb.m3u
-# https://raw.githubusercontent.com/zwc456baby/iptv_alive/master/live.txt
