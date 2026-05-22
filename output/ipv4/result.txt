@@ -1,33 +1,41 @@
 🕘️更新时间,#genre#
-2026-05-23 00:11:58,http://74.91.26.218:82/live/cctv1hd.m3u8
+2026-05-23 00:15:58,http://74.91.26.218:82/live/cctv1hd.m3u8
 
-VTV,#genre#
+VTV - Kênh Quốc Gia,#genre#
 
-HTV,#genre#
+HTV - TP Hồ Chí Minh,#genre#
 
-Địa phương,#genre#
+Địa Phương - Miền Bắc,#genre#
 
-VTVcab,#genre#
+Địa Phương - Miền Trung,#genre#
+
+Địa Phương - Miền Nam,#genre#
+
+VTVcab - Truyền Hình Cáp,#genre#
 
 SCTV,#genre#
 
-K+,#genre#
+K Plus,#genre#
 
-FPT,#genre#
+FPT Play,#genre#
 
-Thể thao quốc tế,#genre#
+Tin Tức - Thời Sự VN,#genre#
 
-Phim,#genre#
+Tin Tức Quốc Tế,#genre#
 
-Tin tức,#genre#
+Thể Thao Việt Nam,#genre#
 
-Thiếu nhi,#genre#
+Thể Thao Quốc Tế,#genre#
 
-Khoa học,#genre#
+Phim Truyện,#genre#
 
-Âm nhạc,#genre#
+Thiếu Nhi,#genre#
 
-Trung Quốc,#genre#
+Khoa Học - Khám Phá,#genre#
+
+Âm Nhạc,#genre#
+
+Kênh Trung Quốc,#genre#
 CCTV-1,http://74.91.26.218:82/live/cctv1hd.m3u8
 CCTV-2,http://74.91.26.218:82/live/cctv2hd.m3u8
 CCTV-3,http://74.91.26.218:82/live/cctv3hd.m3u8
@@ -43,7 +51,7 @@ CCTV-13,http://74.91.26.218:82/live/cctv13hd.m3u8
 CCTV-14,http://74.91.26.218:82/live/cctv14hd.m3u8
 CCTV-15,http://74.91.26.218:82/live/cctv15hd.m3u8
 
-Quốc tế,#genre#
+Kênh Quốc Tế Khác,#genre#
 KBS World,https://liveh12.vtvprime.vn/hls/KBS/03.m3u8
 
 ♻️未匹配频道,#genre#

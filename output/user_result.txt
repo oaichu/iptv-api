@@ -1,37 +1,45 @@
 🕘️更新时间,#genre#
-2026-05-23 00:11:58,https://jmp2.uk/plu-60d3583ef310610007fb02b1.m3u8
+2026-05-23 00:15:57,https://jmp2.uk/plu-60d3583ef310610007fb02b1.m3u8
 
-VTV,#genre#
+VTV - Kênh Quốc Gia,#genre#
 
-HTV,#genre#
+HTV - TP Hồ Chí Minh,#genre#
 
-Địa phương,#genre#
+Địa Phương - Miền Bắc,#genre#
 
-VTVcab,#genre#
+Địa Phương - Miền Trung,#genre#
+
+Địa Phương - Miền Nam,#genre#
+
+VTVcab - Truyền Hình Cáp,#genre#
 
 SCTV,#genre#
 
-K+,#genre#
+K Plus,#genre#
 
-FPT,#genre#
+FPT Play,#genre#
 
-Thể thao quốc tế,#genre#
+Tin Tức - Thời Sự VN,#genre#
 
-Phim,#genre#
-
-Tin tức,#genre#
+Tin Tức Quốc Tế,#genre#
 Euronews,https://jmp2.uk/plu-60d3583ef310610007fb02b1.m3u8
 Euronews,https://jmp2.uk/plu-61b86ea479a4390007c6d5fc.m3u8
 Euronews,https://jmp2.uk/plu-61de8e502c8e9400077e5de7.m3u8
 Euronews,https://jmp2.uk/plu-61de90a47365340007f77c27.m3u8
 
-Thiếu nhi,#genre#
+Thể Thao Việt Nam,#genre#
 
-Khoa học,#genre#
+Thể Thao Quốc Tế,#genre#
 
-Âm nhạc,#genre#
+Phim Truyện,#genre#
 
-Trung Quốc,#genre#
+Thiếu Nhi,#genre#
+
+Khoa Học - Khám Phá,#genre#
+
+Âm Nhạc,#genre#
+
+Kênh Trung Quốc,#genre#
 CCTV-1,http://74.91.26.218:82/live/cctv1hd.m3u8
 CCTV-2,http://74.91.26.218:82/live/cctv2hd.m3u8
 CCTV-3,http://74.91.26.218:82/live/cctv3hd.m3u8
@@ -51,7 +59,7 @@ CCTV-14,http://74.91.26.218:82/live/cctv14hd.m3u8
 CCTV-15,http://74.91.26.218:82/live/cctv15hd.m3u8
 CCTV-15,https://xykt-fix.github.io/play/a02e/index.m3u8
 
-Quốc tế,#genre#
+Kênh Quốc Tế Khác,#genre#
 KBS World,https://liveh12.vtvprime.vn/hls/KBS/03.m3u8
 
 ♻️未匹配频道,#genre#
