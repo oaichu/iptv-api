@@ -1,4 +1,4 @@
-01. VTV - Kênh Quốc Gia,#genre#
+VTV,#genre#
 VTV1
 VTV1 HD
 VTV2
@@ -6,32 +6,43 @@ VTV2 HD
 VTV3
 VTV3 HD
 VTV4
+VTV4 HD
 VTV5
+VTV5 HD
 VTV5 Tây Nam Bộ
 VTV5 Tây Nguyên
 VTV6
+VTV6 HD
 VTV7
+VTV7 HD
 VTV8
+VTV8 HD
 VTV9
+VTV9 HD
 VTV10
 
-02. HTV - TP.HCM,#genre#
+HTV,#genre#
 HTV1
 HTV2
 HTV3
 HTV4
 HTV7
+HTV7 HD
 HTV9
+HTV9 HD
 HTV Thể Thao
 HTV Sports
-HTV Key
-HTVC
+HTVC Gia Đình
+HTVC Phim
+HTVC Thuần Việt
+HTVC Ca Nhạc
+HTVC Phụ Nữ
 
-03. Địa Phương - Miền Bắc,#genre#
+Địa phương,#genre#
 Hà Nội 1
 Hà Nội 2
 Hải Phòng TV
-QTV Quảng Ninh
+Quảng Ninh TV
 Bắc Ninh TV
 Bắc Giang TV
 Hải Dương TV
@@ -54,8 +65,6 @@ Lạng Sơn TV
 Lai Châu TV
 Sơn La TV
 Hòa Bình TV
-
-04. Địa Phương - Miền Trung,#genre#
 Quảng Bình TV
 Quảng Trị TV
 TRT Huế
@@ -72,15 +81,12 @@ Gia Lai TV
 Đắk Lắk TV
 Đắk Nông TV
 Lâm Đồng TV
-
-05. Địa Phương - Miền Nam,#genre#
-Bình Dương TV
+BTV Bình Dương
 Đồng Nai TV
 Bà Rịa Vũng Tàu TV
 Long An TV
 Tiền Giang TV
 Bến Tre TV
-Trà Vinh TV
 THVL1
 THVL2
 THVL3
@@ -95,10 +101,29 @@ Bạc Liêu TV
 Cà Mau TV
 Tây Ninh TV
 Bình Phước TV
+Trà Vinh TV
 
-06. VTVcab - Truyền Hình Cáp Việt Nam,#genre#
-VTVcab
+VTVcab,#genre#
+VTVcab 1
+VTVcab 2
+VTVcab 3
+VTVcab 4
+VTVcab 5
+VTVcab 6
+VTVcab 7
+VTVcab 8
+VTVcab 9
+VTVcab 10
+VTVcab 11
+VTVcab 12
+VTVcab 15
+VTVcab 16
+VTVcab 17
+VTVcab 18
+VTVcab 19
+VTVcab 20
 ON Sports
+ON Sports News
 ON Football
 ON Golf
 ON Movies
@@ -106,8 +131,10 @@ ON Music
 ON Kids
 ON Vie
 ON Cine
+ON Trending
+ON E Channel
 
-07. SCTV,#genre#
+SCTV,#genre#
 SCTV1
 SCTV2
 SCTV3
@@ -124,82 +151,104 @@ SCTV13
 SCTV14
 SCTV15
 SCTV16
-SCTV Phim
+SCTV17
+SCTV18
+SCTV19
+SCTV20
+SCTV Phim Tổng Hợp
+SCTV Phim Việt
 SCTV Thể Thao
 SCTV Ca Nhạc
 SCTV Thiếu Nhi
 
-08. FPT Play - FPT TV,#genre#
-FPT Play
-FPT TV
-
-09. K Plus,#genre#
-K+ Sport
+K+,#genre#
+K+1
+K+ Sport 1
+K+ Sport 2
 K+ Cine
 K+ Life
 K+ Kids
 K+ Action
+K+ NS
+K+ PM
 
-10. Tin Tức - Thời Sự,#genre#
-VNews
-Thông Tấn
-Quốc Hội TV
-Nhân Dân TV
-ANTV
-QPVN
+FPT,#genre#
+FPT Play
+FPT TV
 
-11. Thể Thao Việt Nam,#genre#
-Bóng Đá TV
-Thể Thao TV
-
-12. Thể Thao Quốc Tế,#genre#
+Thể thao quốc tế,#genre#
 ESPN
+ESPN 2
 Fox Sports
+Fox Sports 2
 Sky Sports
+Sky Sports Main Event
+Sky Sports Premier League
+Sky Sports Football
+Sky Sports F1
 beIN Sports
+beIN Sports 1
+beIN Sports 2
+beIN Sports 3
+beIN Sports Max
 Eurosport
+Eurosport 1
+Eurosport 2
 DAZN
 CBS Sports
-TNT Sports
-BT Sport
-Premier League TV
 NBA TV
-NFL
-MLB
+NFL Network
 Golf Channel
-WWE
-UFC
+WWE Network
+SuperSport
 
-13. Phim - Series,#genre#
+Phim,#genre#
 HBO
+HBO HD
+HBO Hits
+HBO Family
 Cinemax
 Star Movies
 AXN
 Warner TV
-Hollywood Classics
 Box Movie
 Kix
 Blue Ant Entertainment
 
-14. Giải Trí - Tổng Hợp,#genre#
-Yeah1 TV
-TodayTV
-Vie Channel
-Vie Giải Trí
-Entertainment
-General
+Tin tức,#genre#
+VNews
+ANTV
+QPVN
+Quốc Hội TV
+Nhân Dân TV
+CNN
+CNN International
+BBC World News
+France 24
+DW
+Euronews
+Al Jazeera
+CNBC
+Bloomberg
+NHK World
+Arirang TV
+CNA
 
-15. Thiếu Nhi - Giáo Dục,#genre#
+Thiếu nhi,#genre#
 Cartoon Network
 Disney Channel
+Disney Junior
 Nickelodeon
 Nick Jr
 Baby TV
 CBeebies
 Da Vinci
+Discovery Kids
 
-16. Khoa Học - Khám Phá,#genre#
+Khoa học,#genre#
 Discovery
+Discovery Channel
+Discovery Science
 Animal Planet
 National Geographic
 Nat Geo Wild
@@ -207,15 +256,13 @@ History
 BBC Earth
 TLC
 Travel Channel
-Science
 
-17. Âm Nhạc,#genre#
+Âm nhạc,#genre#
 MTV
+MTV Live
 Channel V
-iTV
-Music
 
-18. Kênh Trung Quốc,#genre#
+Trung Quốc,#genre#
 CCTV-1
 CCTV-2
 CCTV-3
@@ -232,32 +279,23 @@ CCTV-12
 CCTV-13
 CCTV-14
 CCTV-15
-CCTV News
 CGTN
 Dragon TV
 Hunan TV
 Jiangsu TV
 Zhejiang TV
 Phoenix TV
-Shenzhen TV
-Guangdong TV
 Beijing TV
 Shanghai TV
 
-19. Kênh Quốc Tế,#genre#
-CNN
-BBC World
+Quốc tế,#genre#
 TV5Monde
 France 24
 DW
-Euronews
-Al Jazeera
-CNBC
-Bloomberg
-NHK World
-Arirang TV
-KBS World
-Channel News Asia
-CNA
 RT
 TRT World
+KBS World
+ABC News
+CBS News
+NBC News
+Fox News
