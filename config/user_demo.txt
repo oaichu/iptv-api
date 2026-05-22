@@ -405,8 +405,6 @@ A&E
 Bravo
 Syfy
 USA Network
-TNT
-TBS
 Peacock
 Tubi
 Pluto TV Movies
@@ -457,8 +455,6 @@ KBS Drama
 MBC Drama
 tvN Movies
 OCN Movies
-CCTV-6
-CCTV-8
 Channel 5
 Film4
 Movies 24
@@ -502,7 +498,9 @@ CCTV-3
 CCTV-4
 CCTV-5
 CCTV-5+
+CCTV-6
 CCTV-7
+CCTV-8
 CCTV-9
 CCTV-10
 CCTV-11
@@ -550,21 +548,18 @@ NHK BS1
 NHK BS Premium
 Nippon TV
 TV Asahi
-TBS
 Fuji TV
 TV Tokyo
 WOWOW
 WOWOW Prime
 WOWOW Live
 WOWOW Cinema
-Animax
 J Sports 1
 J Sports 2
 J Sports 3
 J Sports 4
 BS Fuji
 BS Asahi
-BS TBS
 BS Nippon
 
 Kênh Khác - Tổng Hợp,#genre#
