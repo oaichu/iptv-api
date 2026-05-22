@@ -49,12 +49,22 @@ jobs:
       - name: Update
         run: pipenv run dev
 
-      - name: Clean Suffix and Translate to Vietnamese
+      - name: Clean Suffix and Translate to Vietnamese + Group Channels
         run: |
           sed -i 's/\$订阅源//g' output/user_result.m3u
           sed -i 's/未匹配频道/Kênh Việt Nam/g' output/user_result.m3u
           sed -i 's/无结果频道/Kênh Lỗi - Không Chạy/g' output/user_result.m3u
           sed -i 's/更新时间/Thời Gian Cập Nhật/g' output/user_result.m3u
+
+          # Phân nhóm kênh tự động (VTV, Địa phương, HTV, SCTV, FPT, Quốc tế...)
+          sed -i '/#EXTINF/s/group-title="[^"]*"/group-title="VTV (Kênh Quốc Gia)"/g' output/user_result.m3u
+          sed -i '/VTV[0-9]/s/group-title="[^"]*"/group-title="VTV (Kênh Quốc Gia)"/g' output/user_result.m3u
+          sed -i '/THVL\|THDT\|THAN\|THBD\|THQN\|THNA\|THLA\|THAG\|THQN\|THBT/s/group-title="[^"]*"/group-title="Địa Phương (Tỉnh\/Thành)"/g' output/user_result.m3u
+          sed -i '/HTV[0-9]\|HTV HD/s/group-title="[^"]*"/group-title="HTV (TP.HCM)"/g' output/user_result.m3u
+          sed -i '/VTV Cab\|VTVcab/s/group-title="[^"]*"/group-title="VTV Cab \/ Truyền Hình Cáp VN"/g' output/user_result.m3u
+          sed -i '/SCTV[0-9]\|SCTV HD/s/group-title="[^"]*"/group-title="SCTV"/g' output/user_result.m3u
+          sed -i '/FPT\|FPT Play/s/group-title="[^"]*"/group-title="FPT Play \/ FPT TV"/g' output/user_result.m3u
+          sed -i '/CNN\|BBC\|Discovery\|National Geographic\|VTV World/s/group-title="[^"]*"/group-title="Quốc Tế"/g' output/user_result.m3u
 
       - name: Commit and push if changed
         run: |
@@ -62,6 +72,6 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git add .
           if ! git diff --staged --quiet; then
-            git commit -m "Github Action Auto Updated with Vietnamese Translation"
+            git commit -m "Github Action Auto Updated with Vietnamese Translation & Channel Groups"
             git push --force
           fi
