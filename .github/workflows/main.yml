@@ -45,7 +45,7 @@ jobs:
           echo "========== config/subscribe.txt =========="
           cat config/subscribe.txt 2>/dev/null || echo "FILE NOT FOUND"
           echo ""
-          echo "========== user_demo.txt - Số nhóm =========="
+          echo "========== user_demo.txt - Tổng số nhóm =========="
           grep '#genre#' config/user_demo.txt 2>/dev/null | wc -l || echo "0"
           echo ""
           echo "========== user_demo.txt - Tổng số tên kênh =========="
@@ -66,27 +66,19 @@ jobs:
           else
             echo "user_result.m3u NOT FOUND"
           fi
-          if [ -f output/user_result.txt ]; then
-            echo "user_result.txt exists"
-            echo "File size: $(wc -c < output/user_result.txt) bytes"
-          fi
 
       - name: Post-process M3U
         run: |
           if [ ! -f output/user_result.m3u ]; then
             echo "LỖI: Không tìm thấy output/user_result.m3u"
-            echo "Kiểm tra lại config/config.ini và output:"
-            find output -type f 2>/dev/null || true
             exit 1
           fi
 
-          # Dịch tiếng Trung còn sót
           sed -i 's/\$订阅源//g' output/user_result.m3u
           sed -i 's/未匹配频道/Kênh Chưa Phân Loại/g' output/user_result.m3u
           sed -i 's/无结果频道/Kênh Lỗi - Không Chạy/g' output/user_result.m3u
           sed -i 's/更新时间/Thời Gian Cập Nhật/g' output/user_result.m3u
 
-          # Loại trùng kênh (giữ link đầu tiên cho mỗi tên kênh)
           python3 <<'PY'
           from pathlib import Path
           from collections import Counter
@@ -102,21 +94,13 @@ jobs:
           while i < len(lines):
               line = lines[i]
               if line.startswith("#EXTINF"):
-                  # Lấy tên kênh
                   match = re.search(r',\s*(.+)$', line)
                   channel_name = match.group(1).strip().lower() if match else ""
 
-                  # Lấy group-title
-                  group_match = re.search(r'group-title="([^"]*)"', line)
-                  group = group_match.group(1) if group_match else ""
-
-                  # Key = tên kênh (lowercase) - KHÔNG phân biệt nhóm để loại trùng triệt để
-                  key = channel_name
-
                   if i + 1 < len(lines) and not lines[i + 1].startswith("#"):
                       url_line = lines[i + 1]
-                      if key not in seen and key != "":
-                          seen.add(key)
+                      if channel_name not in seen and channel_name != "":
+                          seen.add(channel_name)
                           output.append(line)
                           output.append(url_line)
                       i += 2
@@ -126,7 +110,6 @@ jobs:
 
           path.write_text("\n".join(output) + "\n", encoding="utf-8")
 
-          # Thống kê
           total = sum(1 for l in output if l.startswith("#EXTINF"))
           print(f"\n{'='*50}")
           print(f"TỔNG SỐ KÊNH (sau loại trùng): {total}")
@@ -150,6 +133,7 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git add .
           if ! git diff --staged --quiet; then
-            git commit -m "Auto Updated IPTV Playlist"
+            git commit -m "Auto Updated IPTV Playlist (verified)"
             git push --force
           fi
+          
