@@ -1,45 +1,3 @@
-name: 'Update schedule'
-
-on:
-  workflow_dispatch:
-
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
-jobs:
-  push:
-    runs-on: ubuntu-latest
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
-    steps:
-      - name: Set branch name
-        run: echo "BRANCH_NAME=${{ github.repository_owner == 'Guovin' && 'gd' || 'master' }}" >> $GITHUB_ENV
-
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ env.BRANCH_NAME }}
-
-      - name: Set up Python 3.13
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.13'
-          update-environment: true
-          cache: 'pipenv'
-
-      - name: Install FFmpeg
-        run: sudo apt-get update && sudo apt-get install -y ffmpeg
-
-      - name: Install pipenv
-        run: pip3 install --user pipenv
-
-      - name: Install dependencies
-        run: pipenv --python 3.13 && pipenv install --deploy
-
-      - name: Update IPTV playlist
-        run: pipenv run dev
-
       - name: Post-process M3U Filter
         run: |
           if [ ! -f output/user_result.m3u ]; then
@@ -51,11 +9,34 @@ jobs:
           from pathlib import Path
           import re
 
+          def remove_chinese(text):
+              # Xoá triệt để chữ Hán, ký hiệu CJK, fullwidth
+              return re.sub(r'[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff\u3000-\u303f\uff00-\uffef]', '', text).strip()
+
           def clean_name(text: str) -> str:
               if not text: return ""
               t = text.lower().strip()
+              
+              # Trích xuất tag chất lượng trong ngoặc trước khi xoá (VD: [FHD], (HD))
+              tags = re.findall(r'[\(\[](.*?)[\)\]]', t)
+              quality_tag = ""
+              for tag in tags:
+                  if re.search(r'(?i)\b(fhd|hd|sd|4k|8k|1080p|720p|2k|uhd)\b', tag):
+                      quality_tag = " hd" if re.search(r'(?i)\b(fhd|hd|4k|8k|1080p|2k|uhd)\b', tag) else " sd"
+                      break
+                      
               t = re.sub(r'[\(\[].*?[\)\]]', '', t)
-              t = re.sub(r'\b(fhd|hd|sd|4k|8k|1080p|720p|2k|uhd|hdr|hevc|h264|h265|live|backup|dự phòng)\b', '', t, flags=re.IGNORECASE)
+              # Chuẩn hoá các tag chất lượng về 'hd' hoặc 'sd'
+              t = re.sub(r'(?i)\b(fhd|4k|8k|1080p|2k|uhd)\b', 'hd', t)
+              t = re.sub(r'(?i)\b(sd|720p)\b', 'sd', t)
+              
+              if quality_tag == " hd" and "hd" not in t:
+                  t += " hd"
+              elif quality_tag == " sd" and "sd" not in t and "hd" not in t:
+                  t += " sd"
+                  
+              t = re.sub(r'(?i)\b(hevc|h264|h265|live|backup|dự phòng)\b', '', t)
+              t = remove_chinese(t) # Xoá tiếng Trung ngay từ bước làm sạch
               t = re.sub(r'[^\w\s\+\-]', '', t, flags=re.UNICODE)
               t = re.sub(r'([a-z])\s+(\d)', r'\1\2', t)
               t = re.sub(r'(\d)\s+([a-z])', r'\1\2', t)
@@ -128,7 +109,7 @@ jobs:
                       match_id = re.search(r'tvg-id="([^"]*)"', current_extinf)
                       raw_channel_name = match_id.group(1) if match_id else raw_channel_name
 
-                  display_name = re.sub(r'[\u4e00-\u9fff]', '', raw_channel_name)
+                  display_name = remove_chinese(raw_channel_name)
                   display_name = re.sub(r'\(\s*\)', '', display_name)
                   display_name = re.sub(r'^[-_|\s]+|[-_|\s]+$', '', display_name).strip()
                   if not display_name: display_name = raw_channel_name
@@ -181,15 +162,30 @@ jobs:
                   output_lines.append(url_line)
                   total_channels += 1
 
+          # Xử lý kênh không có trong demo (Làm sạch tiếng Trung trước khi ghi)
           if unmatched:
               output_lines.append('')
               seen_unmatched = set()
               for extinf, url in unmatched:
                   if url in seen_unmatched: continue
+                  
+                  parts = extinf.split(",")
+                  base_info = parts[0]
+                  raw_name = parts[-1].strip() if len(parts) > 1 else ""
+                  
+                  clean_name_text = remove_chinese(raw_name)
+                  clean_name_text = re.sub(r'\(\s*\)', '', clean_name_text)
+                  clean_name_text = re.sub(r'^[-_|\s]+|[-_|\s]+$', '', clean_name_text).strip()
+                  
+                  # Nếu xoá tiếng Trung xong mà tên bị rỗng -> Bỏ qua kênh rác
+                  if not clean_name_text:
+                      continue
+                      
                   seen_unmatched.add(url)
-                  if 'group-title="' not in extinf:
-                      extinf = extinf.replace("#EXTINF:-1", '#EXTINF:-1 group-title="Kênh Khác"')
-                  output_lines.append(extinf)
+                  if 'group-title="' not in base_info:
+                      base_info = base_info.replace("#EXTINF:-1", '#EXTINF:-1 group-title="Kênh Khác"')
+                  
+                  output_lines.append(f"{base_info},{clean_name_text}")
                   output_lines.append(url)
                   total_channels += 1
 
@@ -206,13 +202,3 @@ jobs:
               print(f"  --. [{len(unmatched):>4} kenh] - Kenh Khac (khong co trong demo)")
           print(f"{'='*70}\n")
           PY
-
-      - name: Commit and push if changed
-        run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git add .
-          if ! git diff --staged --quiet; then
-            git commit -m "Update IPTV playlist and fix demo logic"
-            git push --force
-          fi
