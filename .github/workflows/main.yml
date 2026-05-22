@@ -1,7 +1,49 @@
-       name: Post-process M3U Filter
+name: 'Update schedule'
+
+"on":
+  workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    steps:
+      - name: Set branch name
+        run: echo "BRANCH_NAME=${{ github.repository_owner == 'Guovin' && 'gd' || 'master' }}" >> $GITHUB_ENV
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.BRANCH_NAME }}
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          update-environment: true
+          cache: 'pipenv'
+
+      - name: Install FFmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Install pipenv
+        run: pip3 install --user pipenv
+
+      - name: Install dependencies
+        run: pipenv --python 3.13 && pipenv install --deploy
+
+      - name: Update IPTV playlist
+        run: pipenv run dev
+
+      - name: Post-process M3U Filter
         run: |
           if [ ! -f output/user_result.m3u ]; then
-            echo "LỖI: Không tìm thấy output/user_result.m3u"
+            echo "LOI: Khong tim thay output/user_result.m3u"
             exit 1
           fi
 
@@ -10,33 +52,26 @@
           import re
 
           def remove_chinese(text):
-              # Xoá triệt để chữ Hán, ký hiệu CJK, fullwidth
               return re.sub(r'[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff\u3000-\u303f\uff00-\uffef]', '', text).strip()
 
           def clean_name(text: str) -> str:
               if not text: return ""
               t = text.lower().strip()
-              
-              # Trích xuất tag chất lượng trong ngoặc trước khi xoá (VD: [FHD], (HD))
               tags = re.findall(r'[\(\[](.*?)[\)\]]', t)
               quality_tag = ""
               for tag in tags:
                   if re.search(r'(?i)\b(fhd|hd|sd|4k|8k|1080p|720p|2k|uhd)\b', tag):
                       quality_tag = " hd" if re.search(r'(?i)\b(fhd|hd|4k|8k|1080p|2k|uhd)\b', tag) else " sd"
                       break
-                      
               t = re.sub(r'[\(\[].*?[\)\]]', '', t)
-              # Chuẩn hoá các tag chất lượng về 'hd' hoặc 'sd'
               t = re.sub(r'(?i)\b(fhd|4k|8k|1080p|2k|uhd)\b', 'hd', t)
               t = re.sub(r'(?i)\b(sd|720p)\b', 'sd', t)
-              
               if quality_tag == " hd" and "hd" not in t:
                   t += " hd"
               elif quality_tag == " sd" and "sd" not in t and "hd" not in t:
                   t += " sd"
-                  
-              t = re.sub(r'(?i)\b(hevc|h264|h265|live|backup|dự phòng)\b', '', t)
-              t = remove_chinese(t) # Xoá tiếng Trung ngay từ bước làm sạch
+              t = re.sub(r'(?i)\b(hevc|h264|h265|live|backup|du phong)\b', '', t)
+              t = remove_chinese(t)
               t = re.sub(r'[^\w\s\+\-]', '', t, flags=re.UNICODE)
               t = re.sub(r'([a-z])\s+(\d)', r'\1\2', t)
               t = re.sub(r'(\d)\s+([a-z])', r'\1\2', t)
@@ -63,7 +98,6 @@
                           if current_group:
                               channels_in_group[current_group].append(line)
           else:
-              print("CẢNH BÁO: Không tìm thấy config/user_demo.txt")
               exit(1)
 
           position_map = {}
@@ -87,33 +121,26 @@
           for i in range(start_idx, len(lines)):
               line = lines[i].strip()
               if not line: continue
-              
               if line.startswith("#EXTINF"):
                   current_extinf = line
               else:
                   if not current_extinf: continue
                   url = line
-
                   if "更新时间" in current_extinf or "Thời Gian Cập Nhật" in current_extinf:
                       current_extinf = None
                       continue
-
                   if url in seen_urls:
                       current_extinf = None
                       continue
-
                   parts = current_extinf.split(",")
                   raw_channel_name = parts[-1].strip() if len(parts) > 1 else ""
-
                   if re.match(r'^\d{4}-\d{2}-\d{2}', raw_channel_name):
                       match_id = re.search(r'tvg-id="([^"]*)"', current_extinf)
                       raw_channel_name = match_id.group(1) if match_id else raw_channel_name
-
                   display_name = remove_chinese(raw_channel_name)
                   display_name = re.sub(r'\(\s*\)', '', display_name)
                   display_name = re.sub(r'^[-_|\s]+|[-_|\s]+$', '', display_name).strip()
                   if not display_name: display_name = raw_channel_name
-
                   clean_display = clean_name(display_name)
 
                   matched_grp = None
@@ -125,10 +152,7 @@
                   else:
                       for demo_clean in sorted(position_map.keys(), key=len, reverse=True):
                           if len(demo_clean) >= 3:
-                              if clean_display == demo_clean or \
-                                 clean_display.startswith(demo_clean + " ") or \
-                                 clean_display.endswith(" " + demo_clean) or \
-                                 (" " + demo_clean + " ") in (" " + clean_display + " "):
+                              if clean_display == demo_clean or clean_display.startswith(demo_clean + " ") or clean_display.endswith(" " + demo_clean) or (" " + demo_clean + " ") in (" " + clean_display + " "):
                                   matched_grp, matched_idx, matched_demo_name = position_map[demo_clean]
                                   break
 
@@ -136,25 +160,20 @@
                       if matched_demo_name in seen_channels:
                           current_extinf = None
                           continue
-                      
                       seen_channels.add(matched_demo_name)
                       seen_urls.add(url)
-
                       base_info = parts[0]
                       if 'group-title="' in base_info:
                           base_info = re.sub(r'group-title="[^"]*"', f'group-title="{matched_grp}"', base_info)
                       else:
                           base_info = base_info.replace("#EXTINF:-1", f'#EXTINF:-1 group-title="{matched_grp}"', 1)
-
                       grouped[matched_grp].append((matched_idx, f"{base_info},{matched_demo_name}", url))
                   else:
                       unmatched.append((current_extinf, url))
-
                   current_extinf = None
 
           output_lines = ['#EXTM3U']
           total_channels = 0
-
           for grp in groups_order:
               sorted_entries = sorted(grouped[grp], key=lambda x: x[0])
               for _, extinf_line, url_line in sorted_entries:
@@ -162,43 +181,35 @@
                   output_lines.append(url_line)
                   total_channels += 1
 
-          # Xử lý kênh không có trong demo (Làm sạch tiếng Trung trước khi ghi)
           if unmatched:
               output_lines.append('')
               seen_unmatched = set()
               for extinf, url in unmatched:
                   if url in seen_unmatched: continue
-                  
                   parts = extinf.split(",")
                   base_info = parts[0]
                   raw_name = parts[-1].strip() if len(parts) > 1 else ""
-                  
                   clean_name_text = remove_chinese(raw_name)
                   clean_name_text = re.sub(r'\(\s*\)', '', clean_name_text)
                   clean_name_text = re.sub(r'^[-_|\s]+|[-_|\s]+$', '', clean_name_text).strip()
-                  
-                  # Nếu xoá tiếng Trung xong mà tên bị rỗng -> Bỏ qua kênh rác
-                  if not clean_name_text:
-                      continue
-                      
+                  if not clean_name_text: continue
                   seen_unmatched.add(url)
                   if 'group-title="' not in base_info:
-                      base_info = base_info.replace("#EXTINF:-1", '#EXTINF:-1 group-title="Kênh Khác"')
-                  
+                      base_info = base_info.replace("#EXTINF:-1", '#EXTINF:-1 group-title="Kenh Khac"')
                   output_lines.append(f"{base_info},{clean_name_text}")
                   output_lines.append(url)
                   total_channels += 1
 
           m3u_path.write_text("\n".join(output_lines) + "\n", encoding="utf-8")
-
-          print(f"\n{'='*70}")
-          print(f"✅ TONG SO KENH SONG THU DUOC: {total_channels}")
-          print(f"{'='*70}")
-          print("THU TU HIEN THI CAC NHOM (Chuan 100% theo file demo):")
-          for idx, grp in enumerate(groups_order, 1):
-              count = len(grouped[grp])
-              print(f"  {idx:02d}. [{count:>4} kenh] - {grp}")
-          if unmatched:
-              print(f"  --. [{len(unmatched):>4} kenh] - Kenh Khac (khong co trong demo)")
-          print(f"{'='*70}\n")
+          print(f"✅ TONG SO KENH: {total_channels}")
           PY
+
+      - name: Commit and push if changed
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add .
+          if ! git diff --staged --quiet; then
+            git commit -m "Update IPTV playlist"
+            git push --force
+          fi
