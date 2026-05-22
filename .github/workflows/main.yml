@@ -49,20 +49,25 @@ jobs:
       - name: Update
         run: pipenv run dev
 
-      - name: Clean Suffix and Translate to Vietnamese + Group Channels (Thứ tự hợp lý)
+      - name: Clean Suffix and Translate to Vietnamese + Group Channels (Kèm Thể Thao Quốc Tế)
         run: |
           sed -i 's/\$订阅源//g' output/user_result.m3u
           sed -i 's/未匹配频道/Kênh Việt Nam/g' output/user_result.m3u
           sed -i 's/无结果频道/Kênh Lỗi - Không Chạy/g' output/user_result.m3u
           sed -i 's/更新时间/Thời Gian Cập Nhật/g' output/user_result.m3u
 
-          # Phân nhóm kênh theo thứ tự hợp lý (ưu tiên VTV → Địa phương → HTV → Cáp → Nội dung → Quốc tế)
+          # Phân nhóm kênh theo thứ tự hợp lý (ưu tiên VTV → Địa phương → HTV → Cáp → Nội dung → Quốc tế → Thể thao)
           sed -i '/VTV[0-9]\|VTV HD/s/group-title="[^"]*"/group-title="VTV (Kênh Quốc Gia)"/g' output/user_result.m3u
           sed -i '/THVL\|THDT\|THAN\|THBD\|THQN\|THNA\|THLA\|THAG\|THBT/s/group-title="[^"]*"/group-title="Địa Phương (Tỉnh\/Thành)"/g' output/user_result.m3u
           sed -i '/HTV[0-9]\|HTV HD/s/group-title="[^"]*"/group-title="HTV (TP.HCM)"/g' output/user_result.m3u
           sed -i '/VTV Cab\|VTVcab/s/group-title="[^"]*"/group-title="VTV Cab \/ Truyền Hình Cáp VN"/g' output/user_result.m3u
           sed -i '/SCTV[0-9]\|SCTV HD/s/group-title="[^"]*"/group-title="SCTV"/g' output/user_result.m3u
           sed -i '/FPT\|FPT Play/s/group-title="[^"]*"/group-title="FPT Play \/ FPT TV"/g' output/user_result.m3u
+
+          # Thể thao quốc tế (ESPN, beIN, Premier League, Champions League, Sky Sports, Fox Sports...)
+          sed -i '/ESPN\|beIN Sports\|Premier League\|Champions League\|Sky Sports\|Fox Sports\|Eurosport\|DAZN\|CBS Sports/s/group-title="[^"]*"/group-title="Thể Thao Quốc Tế"/g' output/user_result.m3u
+
+          # Các kênh quốc tế còn lại
           sed -i '/CNN\|BBC\|Discovery\|National Geographic\|VTV World/s/group-title="[^"]*"/group-title="Quốc Tế"/g' output/user_result.m3u
 
       - name: Commit and push if changed
@@ -71,6 +76,6 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git add .
           if ! git diff --staged --quiet; then
-            git commit -m "Github Action Auto Updated with Vietnamese Translation & Channel Groups"
+            git commit -m "Github Action Auto Updated with Vietnamese Translation & Channel Groups (Thể Thao Quốc Tế)"
             git push --force
           fi
