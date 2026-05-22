@@ -1,6 +1,17 @@
-# https://iptv.b2og.com
-# https://raw.githubusercontent.com/FreedomLive/iptv/master/iptv-all.m3u
-# https://raw.githubusercontent.com/iptv-org/iptv/master/streams/int.m3u
-https://raw.githubusercontent.com/iptv-org/iptv/master/streams/cn.m3u
-
-# https://raw.githubusercontent.com/iptv-org/iptv/master/streams/vn.m3u
+https://raw.githubusercontent.com/anthonynguyen91/IPTV/main/vietnam.m3u
+https://raw.githubusercontent.com/supper990/IPTV/main/playlist.m3u
+https://raw.githubusercontent.com/Free-TV/IPTV/master/playlist.m3u
+https://iptv-org.github.io/iptv/countries/vn.m3u
+https://iptv-org.github.io/iptv/categories/news.m3u
+https://iptv-org.github.io/iptv/categories/sports.m3u
+https://iptv-org.github.io/iptv/categories/movies.m3u
+https://iptv-org.github.io/iptv/categories/kids.m3u
+https://iptv-org.github.io/iptv/categories/entertainment.m3u
+https://iptv-org.github.io/iptv/categories/documentary.m3u
+https://iptv-org.github.io/iptv/categories/music.m3u
+https://iptv-org.github.io/iptv/categories/general.m3u
+https://iptv-org.github.io/iptv/countries/us.m3u
+https://iptv-org.github.io/iptv/countries/uk.m3u
+https://iptv-org.github.io/iptv/countries/cn.m3u
+https://iptv-org.github.io/iptv/countries/jp.m3u
+https://iptv-org.github.io/iptv/countries/kr.m3u
