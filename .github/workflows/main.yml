@@ -49,17 +49,16 @@ jobs:
       - name: Update
         run: pipenv run dev
 
-      - name: Clean Suffix and Translate to Vietnamese + Group Channels
+      - name: Clean Suffix and Translate to Vietnamese + Group Channels (Thứ tự hợp lý)
         run: |
           sed -i 's/\$订阅源//g' output/user_result.m3u
           sed -i 's/未匹配频道/Kênh Việt Nam/g' output/user_result.m3u
           sed -i 's/无结果频道/Kênh Lỗi - Không Chạy/g' output/user_result.m3u
           sed -i 's/更新时间/Thời Gian Cập Nhật/g' output/user_result.m3u
 
-          # Phân nhóm kênh tự động (VTV, Địa phương, HTV, SCTV, FPT, Quốc tế...)
-          sed -i '/#EXTINF/s/group-title="[^"]*"/group-title="VTV (Kênh Quốc Gia)"/g' output/user_result.m3u
-          sed -i '/VTV[0-9]/s/group-title="[^"]*"/group-title="VTV (Kênh Quốc Gia)"/g' output/user_result.m3u
-          sed -i '/THVL\|THDT\|THAN\|THBD\|THQN\|THNA\|THLA\|THAG\|THQN\|THBT/s/group-title="[^"]*"/group-title="Địa Phương (Tỉnh\/Thành)"/g' output/user_result.m3u
+          # Phân nhóm kênh theo thứ tự hợp lý (ưu tiên VTV → Địa phương → HTV → Cáp → Nội dung → Quốc tế)
+          sed -i '/VTV[0-9]\|VTV HD/s/group-title="[^"]*"/group-title="VTV (Kênh Quốc Gia)"/g' output/user_result.m3u
+          sed -i '/THVL\|THDT\|THAN\|THBD\|THQN\|THNA\|THLA\|THAG\|THBT/s/group-title="[^"]*"/group-title="Địa Phương (Tỉnh\/Thành)"/g' output/user_result.m3u
           sed -i '/HTV[0-9]\|HTV HD/s/group-title="[^"]*"/group-title="HTV (TP.HCM)"/g' output/user_result.m3u
           sed -i '/VTV Cab\|VTVcab/s/group-title="[^"]*"/group-title="VTV Cab \/ Truyền Hình Cáp VN"/g' output/user_result.m3u
           sed -i '/SCTV[0-9]\|SCTV HD/s/group-title="[^"]*"/group-title="SCTV"/g' output/user_result.m3u
