@@ -33,13 +33,7 @@ jobs:
       - name: Install dependencies
         run: pipenv --python 3.13 && pipenv install --deploy
 
-      - name: Apply custom config
-        run: |
-          if [ -f config/user_config.ini ]; then
-            cp config/user_config.ini config/config.ini
-            echo "Da ap dung user_config.ini"
-          fi
-
+      # 直接运行，读取你刚才修改好的 config/config.ini
       - name: Update IPTV playlist
         run: pipenv run dev
 
@@ -174,7 +168,8 @@ jobs:
           if [ -f output/user_result.m3u ]; then
             python3 filter.py output/user_result.m3u
           elif [ -f output/result.m3u ]; then
-            python3 filter.py output/result.m3u
+            cp output/result.m3u output/user_result.m3u
+            python3 filter.py output/user_result.m3u
           else
             echo "Khong tim thay file M3U"
           fi
