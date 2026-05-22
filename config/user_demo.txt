@@ -31,7 +31,6 @@ HTV7 HD
 HTV9
 HTV9 HD
 HTV Thể Thao
-HTV Sports
 HTVC Gia Đình
 HTVC Phim
 HTVC Thuần Việt
@@ -197,8 +196,6 @@ Euronews
 Al Jazeera
 CNBC
 Bloomberg
-NHK World
-Arirang TV
 CNA
 
 Thể Thao Việt Nam,#genre#
@@ -208,41 +205,267 @@ Thể Thao TV
 Thể Thao Quốc Tế,#genre#
 ESPN
 ESPN 2
+ESPN 3
+ESPN News
+ESPN Deportes
+ESPN Classic
 Fox Sports
+Fox Sports 1
 Fox Sports 2
+Fox Sports 3
 Sky Sports
 Sky Sports Main Event
 Sky Sports Premier League
 Sky Sports Football
 Sky Sports F1
+Sky Sports Cricket
+Sky Sports Golf
+Sky Sports Tennis
+Sky Sports Action
+Sky Sports Arena
+Sky Sports News
 beIN Sports
 beIN Sports 1
 beIN Sports 2
 beIN Sports 3
+beIN Sports 4
+beIN Sports 5
+beIN Sports 6
+beIN Sports 7
 beIN Sports Max
+beIN Sports Xtra
 Eurosport
 Eurosport 1
 Eurosport 2
 DAZN
+DAZN 1
+DAZN 2
 CBS Sports
+CBS Sports Network
+TNT Sports
+TNT Sports 1
+TNT Sports 2
+TNT Sports 3
+BT Sport 1
+BT Sport 2
+BT Sport 3
 NBA TV
 NFL Network
+NFL RedZone
+MLB Network
 Golf Channel
 WWE Network
+UFC Fight Pass
+Fight Sports
 SuperSport
+SuperSport 1
+SuperSport 2
+SuperSport 3
+Sport TV
+Sport TV 1
+Sport TV 2
+Sport TV 3
+Movistar Deportes
+Movistar Liga de Campeones
+TUDN
+Gol TV
+Ziggo Sport
+Eleven Sports
+Eleven Sports 1
+Eleven Sports 2
+Star Sports
+Star Sports 1
+Star Sports 2
+Star Sports 3
+Star Sports Select
+Sony Sports Ten 1
+Sony Sports Ten 2
+Sony Sports Ten 3
+Sony Sports Ten 4
+Sony Sports Ten 5
+Astro SuperSport
+Astro Arena
+SPOTV
+SPOTV 2
+Viaplay Sports
+Viaplay Sports 1
+Viaplay Sports 2
+Premier Sports
+Premier Sports 1
+Premier Sports 2
+Setanta Sports
+Setanta Sports 1
+Setanta Sports 2
+Arena Sport
+Arena Sport 1
+Arena Sport 2
+Arena Sport 3
+Nova Sport
+Nova Sport 1
+Nova Sport 2
+Polsat Sport
+Polsat Sport Extra
+Canal+ Sport
+Canal+ Sport 2
+Canal+ Foot
+Canal+ Premier League
+RMC Sport
+RMC Sport 1
+RMC Sport 2
+WOWOW Sports
+Sportitalia
+Rai Sport
+Match TV
+Telefoot
+Optus Sport
+Stan Sport
+TSN
+TSN 1
+TSN 2
+TSN 3
+TSN 4
+TSN 5
+Sportsnet
+Sportsnet One
+Sportsnet 360
+Sportsnet World
+Olympic Channel
+Red Bull TV
+Motorsport TV
+Racing TV
+At The Races
+Willow Cricket
+Cricket Gateway
+ICC TV
+Tennis Channel
+Badminton TV
+World Surf League
+Extreme Sports Channel
+Fuel TV
+EDGEsport
 
 Phim Truyện,#genre#
 HBO
 HBO HD
 HBO Hits
 HBO Family
+HBO Signature
+HBO Comedy
+HBO Zone
+HBO Latino
+HBO Max
 Cinemax
+Cinemax 2
+MoreMax
+ActionMax
+ThrillerMax
 Star Movies
+Star Movies HD
+Star Movies Select
 AXN
+AXN HD
+AXN White
+AXN Black
 Warner TV
+Warner TV HD
 Box Movie
 Kix
 Blue Ant Entertainment
+Showtime
+Showtime 2
+SHO 2
+Showtime Extreme
+Starz
+Starz Cinema
+Starz Edge
+Starz Comedy
+Starz Kids & Family
+Encore
+Encore Action
+Encore Classic
+Encore Suspense
+AMC
+AMC+
+IFC
+Sundance TV
+Turner Classic Movies
+TCM
+FX
+FXX
+FX Movie Channel
+Paramount Network
+Paramount Movies
+MGM
+MGM HD
+Hallmark Channel
+Hallmark Movies & Mysteries
+Lifetime
+Lifetime Movies
+A&E
+Bravo
+Syfy
+USA Network
+TNT
+TBS
+Peacock
+Tubi
+Pluto TV Movies
+Roku Channel
+Crackle
+Filmbox
+Filmbox Premium
+Filmbox Extra
+Filmbox Stars
+Filmbox Family
+Filmbox Arthouse
+CineStar TV
+CineStar Premiere
+Canal+
+Canal+ Cinema
+Canal+ Premier
+Canal+ Family
+Canal+ Decale
+OCS Max
+OCS Choc
+OCS City
+OCS Geants
+Sky Cinema
+Sky Cinema Premiere
+Sky Cinema Action
+Sky Cinema Comedy
+Sky Cinema Drama
+Sky Cinema Family
+Sky Cinema Thriller
+Sky Cinema Sci-Fi
+Zee Cinema
+Zee Cinema HD
+Star Gold
+Star Gold 2
+Sony Max
+Sony Max 2
+Sony Pix
+Colors Cineplex
+Colors Cineplex HD
+Rishtey Cineplex
+B4U Movies
+B4U Kadak
+Thrill
+SET Movies
+Animax
+GEM
+KBS Drama
+MBC Drama
+tvN Movies
+OCN Movies
+CCTV-6
+CCTV-8
+Channel 5
+Film4
+Movies 24
+Sony Movies
+True Film
+Celestial Movies
+Celestial Classic Movies
 
 Thiếu Nhi,#genre#
 Cartoon Network
@@ -279,9 +502,7 @@ CCTV-3
 CCTV-4
 CCTV-5
 CCTV-5+
-CCTV-6
 CCTV-7
-CCTV-8
 CCTV-9
 CCTV-10
 CCTV-11
@@ -298,12 +519,70 @@ Phoenix TV
 Beijing TV
 Shanghai TV
 
-Kênh Quốc Tế Khác,#genre#
+Kênh Hàn Quốc,#genre#
+KBS World
+KBS 1TV
+KBS 2TV
+MBC
+MBC Every1
+SBS
+SBS Plus
+JTBC
+tvN
+tvN Asia
+OCN
+Mnet
+MBC Sports+
+SBS Sports
+KBS N Sports
+Arirang TV
+Channel A
+TV Chosun
+EBS
+EBS Plus
+YTN
+
+Kênh Nhật Bản,#genre#
+NHK World
+NHK General
+NHK Educational
+NHK BS1
+NHK BS Premium
+Nippon TV
+TV Asahi
+TBS
+Fuji TV
+TV Tokyo
+WOWOW
+WOWOW Prime
+WOWOW Live
+WOWOW Cinema
+Animax
+J Sports 1
+J Sports 2
+J Sports 3
+J Sports 4
+BS Fuji
+BS Asahi
+BS TBS
+BS Nippon
+
+Kênh Khác - Tổng Hợp,#genre#
 TV5Monde
 RT
 TRT World
-KBS World
 ABC News
 CBS News
 NBC News
 Fox News
+Sky News
+Al Arabiya
+TRT Haber
+Star Plus India
+Zee TV
+Colors TV
+SET India
+France 24 English
+France 24 French
+BBC Arabic
+Deutsche Welle
