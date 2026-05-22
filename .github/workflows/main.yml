@@ -39,14 +39,18 @@ jobs:
         run: pipenv --python 3.13 && pipenv install --deploy
       - name: Update
         run: pipenv run dev
-      - name: Clean Suffix for IPTV Smarters
-        run: sed -i 's/\$订阅源//g' output/user_result.m3u
+      - name: Clean Suffix and Translate to Vietnamese
+        run: |
+          sed -i 's/\$订阅源//g' output/user_result.m3u
+          sed -i 's/未匹配频道/Kênh Việt Nam/g' output/user_result.m3u
+          sed -i 's/无结果频道/Kênh Lỗi - Không Chạy/g' output/user_result.m3u
+          sed -i 's/更新时间/Thời Gian Cập Nhật/g' output/user_result.m3u
       - name: Commit and push if changed
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add .
           if ! git diff --staged --quiet; then
-            git commit -m "Github Action Auto Updated"
+            git commit -m "Github Action Auto Updated with Vietnamese Translation"
             git push --force
           fi
