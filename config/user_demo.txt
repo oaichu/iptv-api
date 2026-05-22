@@ -1,0 +1,45 @@
+📺 Kênh Việt Nam,#genre#
+VTV1
+VTV2
+VTV3
+VTV4
+VTV5
+VTV6
+VTV7
+VTV8
+VTV9
+VTV10
+HTV7
+HTV9
+THVL1
+THVL2
+
+📺 Kênh Trung Quốc,#genre#
+CCTV-1
+CCTV-2
+CCTV-3
+CCTV-4
+CCTV-5
+CCTV-6
+CCTV-7
+CCTV-8
+CCTV-13
+CCTV News
+CGTN
+Dragon TV
+Hunan TV
+Jiangsu TV
+Zhejiang TV
+Phoenix TV
+
+📺 Kênh Quốc Tế,#genre#
+CNN
+BBC World
+Discovery
+National Geographic
+HBO
+Star Movies
+TV5Monde
+France 24
+DW
+Euronews
