@@ -51,7 +51,7 @@ jobs:
       - name: Update IPTV playlist
         run: pipenv run dev
 
-      - name: Post-process M3U (Dịch tiếng Trung còn sót)
+      - name: Post-process M3U (Dịch + Loại trùng)
         run: |
           if [ ! -f output/user_result.m3u ]; then
             echo "Không tìm thấy output/user_result.m3u"
@@ -59,18 +59,67 @@ jobs:
             exit 1
           fi
 
+          # Dịch tiếng Trung còn sót
           sed -i 's/\$订阅源//g' output/user_result.m3u
           sed -i 's/未匹配频道/Kênh Chưa Phân Loại/g' output/user_result.m3u
           sed -i 's/无结果频道/Kênh Lỗi - Không Chạy/g' output/user_result.m3u
           sed -i 's/更新时间/Thời Gian Cập Nhật/g' output/user_result.m3u
 
-          echo ""
-          echo "===== KẾT QUẢ ====="
-          echo "Tổng số kênh trong M3U:"
-          grep -c '^#EXTINF' output/user_result.m3u || true
-          echo ""
-          echo "Phân bổ theo nhóm:"
-          grep '^#EXTINF' output/user_result.m3u | sed -n 's/.*group-title="\([^"]*\)".*/\1/p' | sort | uniq -c | sort -rn || true
+          # Loại trùng kênh (giữ link đầu tiên cho mỗi tên kênh trong cùng nhóm)
+          python3 <<'PY'
+          from pathlib import Path
+          import re
+
+          path = Path("output/user_result.m3u")
+          text = path.read_text(encoding="utf-8", errors="ignore")
+          lines = text.splitlines()
+
+          seen = set()
+          output = []
+          i = 0
+          while i < len(lines):
+              line = lines[i]
+              if line.startswith("#EXTINF"):
+                  # Lấy tên kênh (phần sau dấu phẩy cuối cùng)
+                  match = re.search(r',\s*(.+)$', line)
+                  channel_name = match.group(1).strip() if match else ""
+
+                  # Lấy group-title
+                  group_match = re.search(r'group-title="([^"]*)"', line)
+                  group = group_match.group(1) if group_match else ""
+
+                  # Key duy nhất = nhóm + tên kênh (lowercase, bỏ khoảng trắng thừa)
+                  key = f"{group}||{channel_name.lower().strip()}"
+
+                  if i + 1 < len(lines) and not lines[i + 1].startswith("#"):
+                      url_line = lines[i + 1]
+                      if key not in seen:
+                          seen.add(key)
+                          output.append(line)
+                          output.append(url_line)
+                      i += 2
+                      continue
+              output.append(line)
+              i += 1
+
+          path.write_text("\n".join(output) + "\n", encoding="utf-8")
+
+          # Thống kê
+          total = sum(1 for l in output if l.startswith("#EXTINF"))
+          print(f"\n===== KẾT QUẢ SAU KHI LOẠI TRÙNG =====")
+          print(f"Tổng số kênh (không trùng): {total}")
+          print(f"\nPhân bổ theo nhóm:")
+
+          from collections import Counter
+          groups = []
+          for l in output:
+              if l.startswith("#EXTINF"):
+                  m = re.search(r'group-title="([^"]*)"', l)
+                  if m:
+                      groups.append(m.group(1))
+          for g, c in Counter(groups).most_common():
+              print(f"  {c:>4}  {g}")
+          PY
 
       - name: Commit and push if changed
         run: |
@@ -78,7 +127,7 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git add .
           if ! git diff --staged --quiet; then
-            git commit -m "Auto Updated IPTV Playlist"
+            git commit -m "Auto Updated IPTV Playlist (deduped)"
             git push --force
           fi
           
