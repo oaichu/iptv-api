@@ -101,7 +101,6 @@ HanoiTV1 (1080p) [Geo-blocked],https://cloudstreamhntv.tek4tv.vn/capture/smil:HN
 HanoiTV1 (720p),https://liveh34.vtvprime.vn/hls/HANOI1TV/index.m3u8
 HanoiTV2 (1080p) [Geo-blocked],https://cloudstreamhntv.tek4tv.vn/live/smil:HN2.smil/playlist.m3u8
 HanoiTV2 (720p),https://liveh34.vtvprime.vn/hls/HANOI2TV/index.m3u8
-HTV1,https://vc.101vn.com/htv/htvcmb.php?id=2631
 HTV Key (720p),https://liveh12.vtvprime.vn/hls/HTVKey/index.m3u8
 Huế TV (720p) [Geo-blocked],https://live.fptplay53.net/epzsd1/hue_hls.smil/chunklist.m3u8
 Khánh Hòa TV (720p),https://livektv2.baokhanhhoa.vn/hls/ktv.m3u8
@@ -11911,6 +11910,7 @@ group-title="数字" zz-definition="HD",重温经典,239.3.1.25:8001
 魅力时尚,239.3.1.196:9012
 少儿动画,239.3.1.199:9000
 动画高清,239.3.1.80:4120
+HTV1,https://vc.101vn.com/htv/htvcmb.php?id=2631
 
 🈳无结果频道,#genre#
 VTV1,url

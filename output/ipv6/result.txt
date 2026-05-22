@@ -614,7 +614,6 @@ HanoiTV1 (1080p) [Geo-blocked],url
 HanoiTV1 (720p),url
 HanoiTV2 (1080p) [Geo-blocked],url
 HanoiTV2 (720p),url
-HTV1,url
 HTV Key (720p),url
 Huế TV (720p) [Geo-blocked],url
 Khánh Hòa TV (720p),url
@@ -11442,3 +11441,4 @@ group-title="数字" zz-definition="HD",重温经典,url
 魅力时尚,url
 少儿动画,url
 动画高清,url
+HTV1,url
