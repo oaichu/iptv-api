@@ -1,4 +1,4 @@
-📺 Kênh Việt Nam,#genre#
+Kenh Viet Nam,#genre#
 VTV1
 VTV2
 VTV3
@@ -14,7 +14,7 @@ HTV9
 THVL1
 THVL2
 
-📺 Kênh Trung Quốc,#genre#
+Kenh Trung Quoc,#genre#
 CCTV-1
 CCTV-2
 CCTV-3
@@ -32,7 +32,7 @@ Jiangsu TV
 Zhejiang TV
 Phoenix TV
 
-📺 Kênh Quốc Tế,#genre#
+Kenh Quoc Te,#genre#
 CNN
 BBC World
 Discovery
