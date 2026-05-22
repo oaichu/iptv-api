@@ -37,25 +37,46 @@ jobs:
       - name: Install dependencies
         run: pipenv --python 3.13 && pipenv install --deploy
 
-      - name: Show config info
+      - name: Debug - Show config
         run: |
-          echo "===== config/config.ini ====="
-          cat config/config.ini || true
+          echo "========== config/config.ini =========="
+          cat config/config.ini 2>/dev/null || echo "FILE NOT FOUND"
           echo ""
-          echo "===== subscribe.txt ====="
-          cat config/subscribe.txt || true
+          echo "========== config/subscribe.txt =========="
+          cat config/subscribe.txt 2>/dev/null || echo "FILE NOT FOUND"
           echo ""
-          echo "===== Tổng số kênh trong user_demo.txt ====="
-          grep -v '^[[:space:]]*$' config/user_demo.txt | grep -v '#genre#' | wc -l || true
+          echo "========== user_demo.txt - Số nhóm =========="
+          grep '#genre#' config/user_demo.txt 2>/dev/null | wc -l || echo "0"
+          echo ""
+          echo "========== user_demo.txt - Tổng số tên kênh =========="
+          grep -v '^[[:space:]]*$' config/user_demo.txt 2>/dev/null | grep -v '#genre#' | grep -v '^\[' | wc -l || echo "0"
 
       - name: Update IPTV playlist
         run: pipenv run dev
 
-      - name: Post-process M3U (Dịch + Loại trùng)
+      - name: Debug - Check output files
+        run: |
+          echo "========== Output files =========="
+          find output -type f 2>/dev/null || echo "No output directory"
+          echo ""
+          if [ -f output/user_result.m3u ]; then
+            echo "user_result.m3u exists"
+            echo "File size: $(wc -c < output/user_result.m3u) bytes"
+            echo "Total EXTINF lines: $(grep -c '^#EXTINF' output/user_result.m3u)"
+          else
+            echo "user_result.m3u NOT FOUND"
+          fi
+          if [ -f output/user_result.txt ]; then
+            echo "user_result.txt exists"
+            echo "File size: $(wc -c < output/user_result.txt) bytes"
+          fi
+
+      - name: Post-process M3U
         run: |
           if [ ! -f output/user_result.m3u ]; then
-            echo "Không tìm thấy output/user_result.m3u"
-            find output -maxdepth 3 -type f || true
+            echo "LỖI: Không tìm thấy output/user_result.m3u"
+            echo "Kiểm tra lại config/config.ini và output:"
+            find output -type f 2>/dev/null || true
             exit 1
           fi
 
@@ -65,9 +86,10 @@ jobs:
           sed -i 's/无结果频道/Kênh Lỗi - Không Chạy/g' output/user_result.m3u
           sed -i 's/更新时间/Thời Gian Cập Nhật/g' output/user_result.m3u
 
-          # Loại trùng kênh (giữ link đầu tiên cho mỗi tên kênh trong cùng nhóm)
+          # Loại trùng kênh (giữ link đầu tiên cho mỗi tên kênh)
           python3 <<'PY'
           from pathlib import Path
+          from collections import Counter
           import re
 
           path = Path("output/user_result.m3u")
@@ -80,20 +102,20 @@ jobs:
           while i < len(lines):
               line = lines[i]
               if line.startswith("#EXTINF"):
-                  # Lấy tên kênh (phần sau dấu phẩy cuối cùng)
+                  # Lấy tên kênh
                   match = re.search(r',\s*(.+)$', line)
-                  channel_name = match.group(1).strip() if match else ""
+                  channel_name = match.group(1).strip().lower() if match else ""
 
                   # Lấy group-title
                   group_match = re.search(r'group-title="([^"]*)"', line)
                   group = group_match.group(1) if group_match else ""
 
-                  # Key duy nhất = nhóm + tên kênh (lowercase, bỏ khoảng trắng thừa)
-                  key = f"{group}||{channel_name.lower().strip()}"
+                  # Key = tên kênh (lowercase) - KHÔNG phân biệt nhóm để loại trùng triệt để
+                  key = channel_name
 
                   if i + 1 < len(lines) and not lines[i + 1].startswith("#"):
                       url_line = lines[i + 1]
-                      if key not in seen:
+                      if key not in seen and key != "":
                           seen.add(key)
                           output.append(line)
                           output.append(url_line)
@@ -106,19 +128,20 @@ jobs:
 
           # Thống kê
           total = sum(1 for l in output if l.startswith("#EXTINF"))
-          print(f"\n===== KẾT QUẢ SAU KHI LOẠI TRÙNG =====")
-          print(f"Tổng số kênh (không trùng): {total}")
-          print(f"\nPhân bổ theo nhóm:")
+          print(f"\n{'='*50}")
+          print(f"TỔNG SỐ KÊNH (sau loại trùng): {total}")
+          print(f"{'='*50}")
+          print(f"\nPHÂN BỔ THEO NHÓM:")
 
-          from collections import Counter
-          groups = []
+          groups_list = []
           for l in output:
               if l.startswith("#EXTINF"):
                   m = re.search(r'group-title="([^"]*)"', l)
                   if m:
-                      groups.append(m.group(1))
-          for g, c in Counter(groups).most_common():
+                      groups_list.append(m.group(1))
+          for g, c in sorted(Counter(groups_list).items()):
               print(f"  {c:>4}  {g}")
+          print(f"\n{'='*50}")
           PY
 
       - name: Commit and push if changed
@@ -127,7 +150,6 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git add .
           if ! git diff --staged --quiet; then
-            git commit -m "Auto Updated IPTV Playlist (deduped)"
+            git commit -m "Auto Updated IPTV Playlist"
             git push --force
           fi
-          
