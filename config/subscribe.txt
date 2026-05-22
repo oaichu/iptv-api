@@ -1,15 +1,35 @@
-https://iptv-org.github.io/iptv/index.m3u
-https://iptv-org.github.io/iptv/languages/vie.m3u
-https://iptv-org.github.io/iptv/languages/zho.m3u
-https://iptv-org.github.io/iptv/categories/sports.m3u
+# ==========================================
+# NGUỒN VIỆT NAM (VTV, HTV, K+, Địa Phương...)
+# ==========================================
+https://iptv-org.github.io/iptv/countries/vn.m3u
+https://raw.githubusercontent.com/iamthanhcsg/IPTV/master/VietNam.m3u
+https://raw.githubusercontent.com/blacktobia/iptv/main/vietnam.m3u
+https://raw.githubusercontent.com/taylordale/IPTV/master/Vietnam.m3u
+https://raw.githubusercontent.com/iptv-org/iptv/master/streams/vn.m3u
+
+# ==========================================
+# NGUỒN CHÂU Á (CCTV, KBS, NHK, TVB...)
+# ==========================================
+https://iptv-org.github.io/iptv/countries/cn.m3u
+https://iptv-org.github.io/iptv/countries/kr.m3u
+https://iptv-org.github.io/iptv/countries/jp.m3u
+https://iptv-org.github.io/iptv/countries/hk.m3u
+https://iptv-org.github.io/iptv/countries/tw.m3u
+https://iptv-org.github.io/iptv/countries/th.m3u
+
+# ==========================================
+# NGUỒN QUỐC TẾ & THỂ THAO & TIN TỨC
+# ==========================================
+https://iptv-org.github.io/iptv/countries/us.m3u
+https://iptv-org.github.io/iptv/countries/gb.m3u
 https://iptv-org.github.io/iptv/categories/news.m3u
+https://iptv-org.github.io/iptv/categories/sports.m3u
 https://iptv-org.github.io/iptv/categories/movies.m3u
 https://iptv-org.github.io/iptv/categories/entertainment.m3u
-https://iptv-org.github.io/iptv/categories/kids.m3u
-https://iptv-org.github.io/iptv/categories/documentary.m3u
-https://iptv-org.github.io/iptv/categories/music.m3u
-https://raw.githubusercontent.com/Free-TV/IPTV/master/playlist.m3u
-https://raw.githubusercontent.com/iptv-org/iptv/master/streams/vn.m3u
-https://raw.githubusercontent.com/iptv-org/iptv/master/streams/cn.m3u
-https://raw.githubusercontent.com/iptv-org/iptv/master/streams/us.m3u
-https://raw.githubusercontent.com/iptv-org/iptv/master/streams/uk.m3u
+
+# ==========================================
+# NGUỒN IPv6 & TỔNG HỢP CHẤT LƯỢNG CAO
+# ==========================================
+https://raw.githubusercontent.com/fanmingming/live/main/tv/m3u/ipv6.m3u
+https://raw.githubusercontent.com/YueChan/Live/main/IPTV.m3u
+https://raw.githubusercontent.com/zwc456baby/iptv_alive/master/live.txt
