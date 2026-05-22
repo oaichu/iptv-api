@@ -1,172 +1,168 @@
-name: 'Update schedule'
+- name: Post-process M3U Filter
+  run: |
+    if [ ! -f output/user_result.m3u ]; then
+      echo "LỖI: Không tìm thấy output/user_result.m3u"
+      exit 1
+    fi
 
-on:
-  workflow_dispatch:
+    python3 <<'PY'
+    from pathlib import Path
+    import re
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    # ========== 1. Làm sạch tên nhưng GIỮ dấu tiếng Việt ==========
+    def clean_name(text: str) -> str:
+        t = text.lower().strip()
+        # Xoá nội dung trong ngoặc (...) [...]
+        t = re.sub(r'[\(\[].*?[\)\]]', '', t)
+        # Xoá từ khoá độ phân giải (có thể tuỳ chỉnh)
+        t = re.sub(r'\b(fhd|hd|sd|4k|1080p|720p|2k)\b', '', t, flags=re.IGNORECASE)
+        # Giữ chữ cái Unicode, số, khoảng trắng, dấu +, -
+        t = re.sub(r'[^\w\s\+\-]', '', t, flags=re.UNICODE)
+        # Xoá dấu +, - thừa ở đầu/cuối (nếu muốn)
+        t = t.strip('+- ')
+        # Gộp nhiều khoảng trắng
+        t = re.sub(r'\s+', ' ', t)
+        return t.strip()
 
-jobs:
-  push:
-    runs-on: ubuntu-latest
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    # ========== 2. Đọc file demo lấy danh sách nhóm + kênh theo đúng thứ tự ==========
+    demo_path = Path("config/user_demo.txt")
+    groups_order = []                     # thứ tự các nhóm
+    channels_in_group = {}                # nhóm -> [tên gốc, tên gốc, ...]
+    current_group = None
 
-    steps:
-      - name: Set branch name
-        run: echo "BRANCH_NAME=${{ github.repository_owner == 'Guovin' && 'gd' || 'master' }}" >> $GITHUB_ENV
+    if demo_path.exists():
+        with open(demo_path, "r", encoding="utf-8", errors="ignore") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                if line.endswith("#genre#"):
+                    current_group = line.replace(",#genre#", "").strip()
+                    if current_group not in groups_order:
+                        groups_order.append(current_group)
+                        channels_in_group[current_group] = []
+                else:
+                    if current_group:
+                        channels_in_group[current_group].append(line)
+    else:
+        print("CẢNH BÁO: Không tìm thấy config/user_demo.txt")
+        exit(1)
 
-      - name: Checkout repository
-        uses: actions/checkout@v5
-        with:
-          ref: ${{ env.BRANCH_NAME }}
+    # Tạo ánh xạ: tên sạch -> (nhóm, vị trí trong demo)
+    # dùng tuple (nhóm, index) để khi sắp xếp giữ đúng thứ tự demo
+    position_map = {}   # clean_name -> (group, idx_in_group)
+    for grp in groups_order:
+        for idx, ch_name in enumerate(channels_in_group[grp]):
+            clean = clean_name(ch_name)
+            # Nếu có trùng lặp tên sạch, ưu tiên cái đầu tiên (theo demo)
+            if clean not in position_map:
+                position_map[clean] = (grp, idx)
 
-      - name: Set up Python 3.13
-        uses: actions/setup-python@v6
-        with:
-          python-version: '3.13'
-          update-environment: true
-          cache: 'pipenv'
+    # ========== 3. Đọc M3U và nhóm kênh theo demo ==========
+    path = Path("output/user_result.m3u")
+    text = path.read_text(encoding="utf-8", errors="ignore")
+    text = text.replace("$订阅源", "")
+    lines = text.splitlines()
 
-      - name: Install FFmpeg
-        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+    # Cấu trúc lưu kênh: { group: [ (extinf, url), ... ] }
+    grouped = {grp: [] for grp in groups_order}
+    unmatched = []   # kênh không khớp demo
 
-      - name: Install pipenv
-        run: pip3 install --user pipenv
+    seen_urls = set()
+    start_idx = 1 if (lines and lines[0].startswith("#EXTM3U")) else 0
 
-      - name: Install dependencies
-        run: pipenv --python 3.13 && pipenv install --deploy
+    current_extinf = None
+    for i in range(start_idx, len(lines)):
+        line = lines[i].strip()
+        if not line:
+            continue
+        if line.startswith("#EXTINF"):
+            current_extinf = line
+        else:
+            if not current_extinf:
+                continue
+            url = line
 
-      - name: Update IPTV playlist
-        run: pipenv run dev
+            # Bỏ qua dòng cập nhật thời gian
+            if "更新时间" in current_extinf or "Thời Gian Cập Nhật" in current_extinf:
+                current_extinf = None
+                continue
 
-      - name: Post-process M3U Filter
-        run: |
-          if [ ! -f output/user_result.m3u ]; then
-            echo "LỖI: Không tìm thấy output/user_result.m3u"
-            exit 1
-          fi
+            if url in seen_urls:
+                current_extinf = None
+                continue
 
-          python3 <<'PY'
-          from pathlib import Path
-          import re
+            # Lấy tên hiển thị
+            parts = current_extinf.split(",")
+            raw_channel_name = parts[-1].strip() if len(parts) > 1 else ""
 
-          def clean_name(text):
-              t = text.lower()
-              t = re.sub(r'[\(\[].*?[\)\]]', '', t)
-              t = re.sub(r'(?i)\b(fhd|hd|sd|4k|1080p|720p|2k)\b', '', t)
-              t = re.sub(r'[^a-z0-9\+\-\s]', '', t)
-              t = re.sub(r'\s+', ' ', t).strip()
-              return t
+            # Nếu tên chỉ là ngày tháng (YYYY-MM-DD), lấy tvg-id
+            if re.match(r'^\d{4}-\d{2}-\d{2}', raw_channel_name):
+                match_id = re.search(r'tvg-id="([^"]*)"', current_extinf)
+                raw_channel_name = match_id.group(1) if match_id else raw_channel_name
 
-          ordered_groups = []
-          group_map = {}
-          demo_path = Path("config/user_demo.txt")
+            # Xoá ký tự Trung Quốc, ngoặc rỗng, ký tự thừa
+            display_name = re.sub(r'[\u4e00-\u9fff]', '', raw_channel_name)
+            display_name = re.sub(r'\(\s*\)', '', display_name)
+            display_name = re.sub(r'^[-_|\s]+|[-_|\s]+$', '', display_name).strip()
+            if not display_name:
+                display_name = raw_channel_name
 
-          if demo_path.exists():
-              with open(demo_path, "r", encoding="utf-8", errors="ignore") as f:
-                  current_group = "Kênh Khác"
-                  for line in f:
-                      line = line.strip()
-                      if not line: continue
-                      if line.endswith("#genre#"):
-                          current_group = line.replace(",#genre#", "").strip()
-                          if current_group not in ordered_groups:
-                              ordered_groups.append(current_group)
-                      else:
-                          norm = clean_name(line)
-                          if norm and norm not in group_map:
-                              group_map[norm] = current_group
+            clean_display = clean_name(display_name)
 
-          sorted_keywords = sorted(group_map.keys(), key=len, reverse=True)
+            # So khớp với danh sách demo
+            if clean_display in position_map:
+                grp, demo_idx = position_map[clean_display]
+                seen_urls.add(url)
 
-          path = Path("output/user_result.m3u")
-          text = path.read_text(encoding="utf-8", errors="ignore")
-          text = text.replace("$订阅源", "")
-          lines = text.splitlines()
+                # Chèn group-title vào #EXTINF
+                base_info = parts[0]
+                if 'group-title="' in base_info:
+                    base_info = re.sub(r'group-title="[^"]*"', f'group-title="{grp}"', base_info)
+                else:
+                    base_info = base_info.replace("#EXTINF:-1", f'#EXTINF:-1 group-title="{grp}"', 1)
 
-          grouped_output = {grp: [] for grp in ordered_groups}
-          seen_urls = set()
+                grouped[grp].append( (demo_idx, f"{base_info},{display_name}", url) )
+            else:
+                # Kênh không có trong demo -> cho vào danh sách riêng (nếu muốn giữ)
+                unmatched.append( (current_extinf, url) )
 
-          start_idx = 1 if (lines and lines[0].startswith("#EXTM3U")) else 0
+            current_extinf = None
 
-          current_extinf = None
-          for i in range(start_idx, len(lines)):
-              line = lines[i].strip()
-              if not line: continue
-              
-              if line.startswith("#EXTINF"):
-                  current_extinf = line
-              else:
-                  if current_extinf:
-                      url = line
-                      if "更新时间" in current_extinf or "Thời Gian Cập Nhật" in current_extinf:
-                          current_extinf = None
-                          continue
+    # ========== 4. Xuất kết quả đúng thứ tự demo ==========
+    output_lines = ['#EXTM3U']
+    total_channels = 0
 
-                      if url in seen_urls:
-                          current_extinf = None
-                          continue
-                      
-                      parts = current_extinf.split(",")
-                      raw_channel_name = parts[-1].strip() if len(parts) > 1 else ""
-                      
-                      if re.match(r'^\d{4}-\d{2}-\d{2}', raw_channel_name):
-                          match_id = re.search(r'tvg-id="([^"]*)"', current_extinf)
-                          raw_channel_name = match_id.group(1) if match_id else raw_channel_name
-                      
-                      display_name = re.sub(r'[\u4e00-\u9fff]', '', raw_channel_name)
-                      display_name = re.sub(r'\(\s*\)', '', display_name)
-                      display_name = re.sub(r'^[-_|\s]+|[-_|\s]+$', '', display_name).strip()
-                      if not display_name: display_name = raw_channel_name
-                          
-                      norm_m3u = clean_name(display_name)
-                      
-                      matched_group = None
-                      for kw in sorted_keywords:
-                          if norm_m3u == kw or norm_m3u.startswith(kw + " ") or norm_m3u.startswith(kw + "-") or f" {kw} " in f" {norm_m3u} ":
-                              matched_group = group_map[kw]
-                              break
-                      
-                      if matched_group:
-                          seen_urls.add(url)
-                          base_info = parts[0]
-                          if 'group-title="' in base_info:
-                              base_info = re.sub(r'group-title="[^"]*"', f'group-title="{matched_group}"', base_info)
-                          else:
-                              base_info = base_info.replace("#EXTINF:-1", f'#EXTINF:-1 group-title="{matched_group}"', 1)
-                          
-                          grouped_output[matched_group].append((f"{base_info},{display_name}", url))
-                      
-                      current_extinf = None
+    for grp in groups_order:
+        # Lấy danh sách kênh đã nhóm, sắp xếp theo vị trí demo_idx
+        sorted_entries = sorted(grouped[grp], key=lambda x: x[0])   # x[0] là demo_idx
+        for _, extinf_line, url_line in sorted_entries:
+            output_lines.append(extinf_line)
+            output_lines.append(url_line)
+            total_channels += 1
 
-          output_lines = ['#EXTM3U']
-          total_channels = 0
+    # (Tuỳ chọn) Thêm kênh không khớp vào cuối cùng, có group-title "Kênh Khác"
+    if unmatched:
+        output_lines.append('')
+        for extinf, url in unmatched:
+            # Thêm group-title nếu chưa có
+            if 'group-title="' not in extinf:
+                extinf = extinf.replace("#EXTINF:-1", '#EXTINF:-1 group-title="Kênh Khác"')
+            output_lines.append(extinf)
+            output_lines.append(url)
+            total_channels += 1
 
-          for grp in ordered_groups:
-              for extinf, url in grouped_output[grp]:
-                  output_lines.append(extinf)
-                  output_lines.append(url)
-                  total_channels += 1
+    path.write_text("\n".join(output_lines) + "\n", encoding="utf-8")
 
-          path.write_text("\n".join(output_lines) + "\n", encoding="utf-8")
-
-          print(f"\n{'='*60}")
-          print(f"✅ TONG SO KENH SONG THU DUOC: {total_channels}")
-          print(f"{'='*60}")
-          print("THU TU HIEN THI CAC NHOM:")
-          for idx, grp in enumerate(ordered_groups, 1):
-              count = len(grouped_output[grp])
-              print(f"  {idx:02d}. [{count:>4} kenh] - {grp}")
-          print(f"{'='*60}\n")
-          PY
-
-      - name: Commit and push if changed
-        run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git add .
-          if ! git diff --staged --quiet; then
-            git commit -m "Fixed YAML Syntax Error and enforced demo logic"
-            git push --force
-          fi
+    # ========== 5. In thông tin ==========
+    print(f"\n{'='*60}")
+    print(f"✅ TỔNG SỐ KÊNH SÓNG THU ĐƯỢC: {total_channels}")
+    print(f"{'='*60}")
+    print("THỨ TỰ HIỂN THỊ CÁC NHÓM (theo demo):")
+    for idx, grp in enumerate(groups_order, 1):
+        count = len(grouped[grp])
+        print(f"  {idx:02d}. [{count:>4} kênh] - {grp}")
+    if unmatched:
+        print(f"  --. [{len(unmatched):>4} kênh] - Kênh Khác (không có trong demo)")
+    print(f"{'='*60}\n")
+    PY
