@@ -1,4 +1,5 @@
-name: 'Update schedule'
+name: 'Update IPTV Playlist'
+
 on:
   workflow_dispatch:
   schedule:
@@ -7,6 +8,7 @@ on:
 jobs:
   push:
     runs-on: ubuntu-latest
+
     steps:
       - name: Set branch name
         run: echo "BRANCH_NAME=${{ github.repository_owner == 'Guovin' && 'gd' || 'master' }}" >> $GITHUB_ENV
@@ -31,9 +33,11 @@ jobs:
       - name: Install dependencies
         run: pipenv --python 3.13 && pipenv install --deploy
 
+      # ==================== 1. CẬP NHẬT PLAYLIST TỪ NGUỒN ====================
       - name: Update IPTV playlist
         run: pipenv run dev
 
+      # ==================== 2. FILTER THEO user_demo.txt ====================
       - name: Create Filter Script
         run: |
           cat << 'PYEOF' > filter.py
@@ -68,7 +72,7 @@ jobs:
               t = _CODE.sub(_code_collapse, t)
               return t
 
-          m3u_path = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("")
+          m3u_path = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("output/result.m3u")
           demo_path = Path("config/user_demo.txt")
 
           if not m3u_path.exists():
@@ -94,7 +98,7 @@ jobs:
           exact_lut = {}
           nohd_lut = {}
           for grp in group_order:
-              for ch in demo_structure[grp]:
+              for ch in demo_structure.get(grp, []):
                   key = norm(ch)
                   if key:
                       exact_lut[key] = (grp, ch)
@@ -110,7 +114,7 @@ jobs:
               if k_nohd in nohd_lut: return nohd_lut[k_nohd]
               return None
 
-          results = {grp: {ch: None for ch in demo_structure[grp]} for grp in group_order}
+          results = {grp: {ch: None for ch in demo_structure.get(grp, [])} for grp in group_order}
           seen_urls = set()
           lines = m3u_path.read_text(encoding="utf-8", errors="ignore").replace("$订阅源", "").splitlines()
 
@@ -150,15 +154,15 @@ jobs:
           out_lines = ["#EXTM3U"]
           total = 0
           for grp in group_order:
-              for ch in demo_structure[grp]:
+              out_lines.append(f"{grp},#genre#")
+              for ch in demo_structure.get(grp, []):
                   if results[grp][ch]:
                       extinf, url = results[grp][ch]
-                      out_lines.append(extinf)
-                      out_lines.append(url)
+                      out_lines.extend([extinf, url])
                       total += 1
 
           Path("output/user_result.m3u").write_text("\n".join(out_lines) + "\n", encoding="utf-8")
-          print(f"✅ FILTER DONE: {total} kênh")
+          print(f"✅ FILTER DONE: {total} kênh khớp với demo")
           PYEOF
 
       - name: Run Filter
@@ -170,16 +174,23 @@ jobs:
             python3 filter.py output/user_result.m3u
           fi
 
-      - name: Check Streams with FFprobe
+      # ==================== 3. LỌC KÊNH CÓ SOFTSUB TIẾNG VIỆT ====================
+      - name: Filter Vietnamese Subtitle
         run: |
-          cat << 'PYEOF' > check.py
+          cat << 'PYEOF' > vi_subtitle_filter.py
           import subprocess
           import concurrent.futures
+          import json
+          import re
           from pathlib import Path
 
-          PROBE_TIMEOUT = 9
-          WORKERS = 20
+          PROBE_TIMEOUT = 10
+          WORKERS = 18
+
           m3u_path = Path("output/user_result.m3u")
+          if not m3u_path.exists():
+              print("❌ File not found")
+              exit(1)
 
           pairs = []
           current = None
@@ -191,36 +202,65 @@ jobs:
                   pairs.append((current, line))
                   current = None
 
-          def is_live(url):
+          print(f"🔍 Checking {len(pairs)} channels for Vietnamese subtitle...")
+
+          def has_vi_sub(url):
               try:
-                  result = subprocess.run([
-                      "ffprobe", "-v", "quiet", "-timeout", str(PROBE_TIMEOUT*1000000),
-                      "-analyzeduration", "1500000", "-probesize", "150000",
-                      "-i", url, "-show_streams"
-                  ], timeout=PROBE_TIMEOUT+5, capture_output=True)
-                  return result.returncode == 0 and b'codec_name' in result.stdout
+                  cmd = [
+                      "ffprobe", "-v", "quiet", "-print_format", "json",
+                      "-show_streams", "-timeout", str(PROBE_TIMEOUT * 1000000),
+                      "-analyzeduration", "1500000", "-probesize", "250000",
+                      "-i", url
+                  ]
+                  result = subprocess.run(cmd, capture_output=True, timeout=PROBE_TIMEOUT + 5)
+                  if result.returncode != 0:
+                      return False
+
+                  data = json.loads(result.stdout)
+                  for stream in data.get("streams", []):
+                      if stream.get("codec_type") == "subtitle":
+                          tags = stream.get("tags", {})
+                          lang = tags.get("language", "").lower()
+                          title = str(tags.get("title", "")).lower()
+                          if lang in ["vi", "vie", "vietnamese"] or any(x in title for x in ["viet", "tiếng việt", "vietsub"]):
+                              return True
               except:
-                  return False
+                  pass
+              return False
 
-          print(f"🔍 Checking {len(pairs)} channels...")
-
-          live_pairs = []
+          live_with_sub = []
           with concurrent.futures.ThreadPoolExecutor(max_workers=WORKERS) as executor:
-              future_to_pair = {executor.submit(is_live, url): (extinf, url) for extinf, url in pairs}
+              future_to_pair = {executor.submit(has_vi_sub, url): (extinf, url) for extinf, url in pairs}
               for future in concurrent.futures.as_completed(future_to_pair):
                   extinf, url = future_to_pair[future]
+                  name = extinf.split(",")[-1].strip()
                   if future.result():
-                      live_pairs.append((extinf, url))
-                      print("✅ LIVE:", extinf.split(",")[-1])
+                      live_with_sub.append((extinf, url))
+                      print(f"✅ [VI SUB] {name}")
                   else:
-                      print("❌ DEAD:", extinf.split(",")[-1])
+                      print(f"❌ {name}")
 
           out_lines = ["#EXTM3U"]
-          for extinf, url in live_pairs:
+          for extinf, url in live_with_sub:
+              if 'tvg-language=' not in extinf:
+                  extinf = re.sub(r'(#EXTINF:-1)', r'\1 tvg-language="vi"', extinf)
               out_lines.extend([extinf, url])
 
           m3u_path.write_text("\n".join(out_lines) + "\n", encoding="utf-8")
-          print(f"🎯 FINAL: {len(live_pairs)}/{len(pairs)} live channels")
+          print(f"🎯 FINAL RESULT: {len(live_with_sub)} channels with Vietnamese subtitle")
           PYEOF
 
-          python3 check.py
+          python3 vi_subtitle_filter.py
+
+      # ==================== COMMIT & PUSH ====================
+      - name: Commit and push if changed
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add output/user_result.m3u
+          if ! git diff --staged --quiet; then
+            git commit -m "Auto update IPTV + Vietnamese subtitle filter [$(date -u '+%Y-%m-%d %H:%M UTC')]"
+            git push --force
+          else
+            echo "No changes to commit"
+          fi
