@@ -1,4 +1,4 @@
-VTV,#genre#
+VTV - Kênh Quốc Gia,#genre#
 VTV1
 VTV1 HD
 VTV2
@@ -21,7 +21,7 @@ VTV9
 VTV9 HD
 VTV10
 
-HTV,#genre#
+HTV - TP Hồ Chí Minh,#genre#
 HTV1
 HTV2
 HTV3
@@ -38,7 +38,7 @@ HTVC Thuần Việt
 HTVC Ca Nhạc
 HTVC Phụ Nữ
 
-Địa phương,#genre#
+Địa Phương - Miền Bắc,#genre#
 Hà Nội 1
 Hà Nội 2
 Hải Phòng TV
@@ -65,6 +65,8 @@ Lạng Sơn TV
 Lai Châu TV
 Sơn La TV
 Hòa Bình TV
+
+Địa Phương - Miền Trung,#genre#
 Quảng Bình TV
 Quảng Trị TV
 TRT Huế
@@ -81,6 +83,8 @@ Gia Lai TV
 Đắk Lắk TV
 Đắk Nông TV
 Lâm Đồng TV
+
+Địa Phương - Miền Nam,#genre#
 BTV Bình Dương
 Đồng Nai TV
 Bà Rịa Vũng Tàu TV
@@ -103,7 +107,7 @@ Tây Ninh TV
 Bình Phước TV
 Trà Vinh TV
 
-VTVcab,#genre#
+VTVcab - Truyền Hình Cáp,#genre#
 VTVcab 1
 VTVcab 2
 VTVcab 3
@@ -161,7 +165,7 @@ SCTV Thể Thao
 SCTV Ca Nhạc
 SCTV Thiếu Nhi
 
-K+,#genre#
+K Plus,#genre#
 K+1
 K+ Sport 1
 K+ Sport 2
@@ -172,11 +176,36 @@ K+ Action
 K+ NS
 K+ PM
 
-FPT,#genre#
+FPT Play,#genre#
 FPT Play
 FPT TV
 
-Thể thao quốc tế,#genre#
+Tin Tức - Thời Sự VN,#genre#
+VNews
+ANTV
+QPVN
+Quốc Hội TV
+Nhân Dân TV
+
+Tin Tức Quốc Tế,#genre#
+CNN
+CNN International
+BBC World News
+France 24
+DW
+Euronews
+Al Jazeera
+CNBC
+Bloomberg
+NHK World
+Arirang TV
+CNA
+
+Thể Thao Việt Nam,#genre#
+Bóng Đá TV
+Thể Thao TV
+
+Thể Thao Quốc Tế,#genre#
 ESPN
 ESPN 2
 Fox Sports
@@ -202,7 +231,7 @@ Golf Channel
 WWE Network
 SuperSport
 
-Phim,#genre#
+Phim Truyện,#genre#
 HBO
 HBO HD
 HBO Hits
@@ -215,26 +244,7 @@ Box Movie
 Kix
 Blue Ant Entertainment
 
-Tin tức,#genre#
-VNews
-ANTV
-QPVN
-Quốc Hội TV
-Nhân Dân TV
-CNN
-CNN International
-BBC World News
-France 24
-DW
-Euronews
-Al Jazeera
-CNBC
-Bloomberg
-NHK World
-Arirang TV
-CNA
-
-Thiếu nhi,#genre#
+Thiếu Nhi,#genre#
 Cartoon Network
 Disney Channel
 Disney Junior
@@ -245,7 +255,7 @@ CBeebies
 Da Vinci
 Discovery Kids
 
-Khoa học,#genre#
+Khoa Học - Khám Phá,#genre#
 Discovery
 Discovery Channel
 Discovery Science
@@ -257,12 +267,12 @@ BBC Earth
 TLC
 Travel Channel
 
-Âm nhạc,#genre#
+Âm Nhạc,#genre#
 MTV
 MTV Live
 Channel V
 
-Trung Quốc,#genre#
+Kênh Trung Quốc,#genre#
 CCTV-1
 CCTV-2
 CCTV-3
@@ -288,10 +298,8 @@ Phoenix TV
 Beijing TV
 Shanghai TV
 
-Quốc tế,#genre#
+Kênh Quốc Tế Khác,#genre#
 TV5Monde
-France 24
-DW
 RT
 TRT World
 KBS World
