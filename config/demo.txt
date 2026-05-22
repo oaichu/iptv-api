@@ -1,33 +1,61 @@
-央视,#genre#
-CCTV-1,http://
-CCTV-2,http://
-CCTV-3,http://
-CCTV-4,http://
-CCTV-5,http://
-CCTV-6,http://
-CCTV-7,http://
-CCTV-8,http://
-CCTV-9,http://
-CCTV-10,http://
-CCTV-11,http://
-CCTV-12,http://
-CCTV-13,http://
-CCTV-14,http://
-CCTV-15,http://
-CCTV-16,http://
-CCTV-17,http://
+📺 Kênh Việt Nam,#genre#
 
-卫视,#genre#
-湖南卫视,http://
-浙江卫视,http://
-江苏卫视,http://
-东方卫视,http://
-北京卫视,http://
-广东卫视,http://
-深圳卫视,http://
-天津卫视,http://
-山东卫视,http://
-安徽卫视,http://
-四川卫视,http://
-重庆卫视,http://
-辽宁卫视,http://
+VTV1
+VTV2
+VTV3
+VTV4
+VTV5
+VTV6
+VTV7
+VTV8
+VTV9
+VTV10
+HTV1
+HTV2
+HTV3
+HTV7
+HTV9
+THVL1
+THVL2
+THVL3
+VTC1
+VTC2
+VTC3
+VTC4
+VTC5
+VTC6
+VTC7
+VTC8
+VTC9
+VTC10
+
+📺 Truyền Hình Tỉnh,#genre#
+
+Hanoi TV
+HCMC TV
+Da Nang TV
+Can Tho TV
+Hai Phong TV
+
+📺 Kênh Quốc Tế,#genre#
+
+CNN
+BBC
+Discovery
+National Geographic
+HBO
+Star Movies
+K+1
+K+2
+K+PM
+K+NS
+
+📺 Thể Thao,#genre#
+
+K+ Sport 1
+K+ Sport 2
+Bóng Đá TV
+On Sports
+On Sports New
+
+📡 M3U Việt Nam,#genre#
