@@ -1,53 +1,53 @@
 #EXTM3U
-#EXTINF:-1 tvg-id="Euronews" tvg-name="Euronews" tvg-logo="http://10.1.0.208:5180/logo/Euronews.png" group-title="Tin Tức Quốc Tế",Euronews
+#EXTINF:-1 tvg-id="Euronews" tvg-name="Euronews" tvg-logo="http://10.1.0.66:5180/logo/Euronews.png" group-title="Tin Tức Quốc Tế",Euronews
 https://jmp2.uk/plu-60d3583ef310610007fb02b1.m3u8
-#EXTINF:-1 tvg-id="Euronews" tvg-name="Euronews" tvg-logo="http://10.1.0.208:5180/logo/Euronews.png" group-title="Tin Tức Quốc Tế",Euronews
+#EXTINF:-1 tvg-id="Euronews" tvg-name="Euronews" tvg-logo="http://10.1.0.66:5180/logo/Euronews.png" group-title="Tin Tức Quốc Tế",Euronews
 https://jmp2.uk/plu-61b86ea479a4390007c6d5fc.m3u8
-#EXTINF:-1 tvg-id="Euronews" tvg-name="Euronews" tvg-logo="http://10.1.0.208:5180/logo/Euronews.png" group-title="Tin Tức Quốc Tế",Euronews
+#EXTINF:-1 tvg-id="Euronews" tvg-name="Euronews" tvg-logo="http://10.1.0.66:5180/logo/Euronews.png" group-title="Tin Tức Quốc Tế",Euronews
 https://jmp2.uk/plu-61de8e502c8e9400077e5de7.m3u8
-#EXTINF:-1 tvg-id="Euronews" tvg-name="Euronews" tvg-logo="http://10.1.0.208:5180/logo/Euronews.png" group-title="Tin Tức Quốc Tế",Euronews
+#EXTINF:-1 tvg-id="Euronews" tvg-name="Euronews" tvg-logo="http://10.1.0.66:5180/logo/Euronews.png" group-title="Tin Tức Quốc Tế",Euronews
 https://jmp2.uk/plu-61de90a47365340007f77c27.m3u8
-#EXTINF:-1 tvg-id="Pluto TV Movies" tvg-name="Pluto TV Movies" tvg-logo="http://10.1.0.208:5180/logo/Pluto TV Movies.png" group-title="Phim Truyện",Pluto TV Movies
+#EXTINF:-1 tvg-id="Pluto TV Movies" tvg-name="Pluto TV Movies" tvg-logo="http://10.1.0.66:5180/logo/Pluto TV Movies.png" group-title="Phim Truyện",Pluto TV Movies
 https://jmp2.uk/plu-5c5c3b948002db3c3e0b262e.m3u8
-#EXTINF:-1 tvg-id="Pluto TV Movies" tvg-name="Pluto TV Movies" tvg-logo="http://10.1.0.208:5180/logo/Pluto TV Movies.png" group-title="Phim Truyện",Pluto TV Movies
+#EXTINF:-1 tvg-id="Pluto TV Movies" tvg-name="Pluto TV Movies" tvg-logo="http://10.1.0.66:5180/logo/Pluto TV Movies.png" group-title="Phim Truyện",Pluto TV Movies
 https://jmp2.uk/plu-5ad8d3a31b95267e225e4e09.m3u8
-#EXTINF:-1 tvg-id="CCTV-1" tvg-name="CCTV-1" tvg-logo="http://10.1.0.208:5180/logo/CCTV-1.png" group-title="Kênh Trung Quốc",CCTV-1
+#EXTINF:-1 tvg-id="CCTV-1" tvg-name="CCTV-1" tvg-logo="http://10.1.0.66:5180/logo/CCTV-1.png" group-title="Kênh Trung Quốc",CCTV-1
 http://[2409:8087:8:21::18]:6610/otttv.bj.chinamobile.com/PLTV/88888888/224/3221226895/1.m3u8?
-#EXTINF:-1 tvg-id="CCTV-2" tvg-name="CCTV-2" tvg-logo="http://10.1.0.208:5180/logo/CCTV-2.png" group-title="Kênh Trung Quốc",CCTV-2
+#EXTINF:-1 tvg-id="CCTV-2" tvg-name="CCTV-2" tvg-logo="http://10.1.0.66:5180/logo/CCTV-2.png" group-title="Kênh Trung Quốc",CCTV-2
 http://[2409:8087:8:21::18]:6610/otttv.bj.chinamobile.com/PLTV/88888888/224/3221226893/1.m3u8?
-#EXTINF:-1 tvg-id="CCTV-3" tvg-name="CCTV-3" tvg-logo="http://10.1.0.208:5180/logo/CCTV-3.png" group-title="Kênh Trung Quốc",CCTV-3
+#EXTINF:-1 tvg-id="CCTV-3" tvg-name="CCTV-3" tvg-logo="http://10.1.0.66:5180/logo/CCTV-3.png" group-title="Kênh Trung Quốc",CCTV-3
 http://[2409:8087:8:21::18]:6610/otttv.bj.chinamobile.com/PLTV/88888888/224/3221226471/1.m3u8?
-#EXTINF:-1 tvg-id="CCTV-4" tvg-name="CCTV-4" tvg-logo="http://10.1.0.208:5180/logo/CCTV-4.png" group-title="Kênh Trung Quốc",CCTV-4
+#EXTINF:-1 tvg-id="CCTV-4" tvg-name="CCTV-4" tvg-logo="http://10.1.0.66:5180/logo/CCTV-4.png" group-title="Kênh Trung Quốc",CCTV-4
 http://[2409:8087:8:21::18]:6610/otttv.bj.chinamobile.com/PLTV/88888888/224/3221226335/1.m3u8?
-#EXTINF:-1 tvg-id="CCTV-5" tvg-name="CCTV-5" tvg-logo="http://10.1.0.208:5180/logo/CCTV-5.png" group-title="Kênh Trung Quốc",CCTV-5
+#EXTINF:-1 tvg-id="CCTV-5" tvg-name="CCTV-5" tvg-logo="http://10.1.0.66:5180/logo/CCTV-5.png" group-title="Kênh Trung Quốc",CCTV-5
 http://[2409:8087:8:21::18]:6610/otttv.bj.chinamobile.com/PLTV/88888888/224/3221226469/1.m3u8?
-#EXTINF:-1 tvg-id="CCTV-5+" tvg-name="CCTV-5+" tvg-logo="http://10.1.0.208:5180/logo/CCTV-5+.png" group-title="Kênh Trung Quốc",CCTV-5+
+#EXTINF:-1 tvg-id="CCTV-5+" tvg-name="CCTV-5+" tvg-logo="http://10.1.0.66:5180/logo/CCTV-5+.png" group-title="Kênh Trung Quốc",CCTV-5+
 http://[2409:8087:8:21::18]:6610/otttv.bj.chinamobile.com/PLTV/88888888/224/3221226894/1.m3u8?
-#EXTINF:-1 tvg-id="CCTV-6" tvg-name="CCTV-6" tvg-logo="http://10.1.0.208:5180/logo/CCTV-6.png" group-title="Kênh Trung Quốc",CCTV-6
+#EXTINF:-1 tvg-id="CCTV-6" tvg-name="CCTV-6" tvg-logo="http://10.1.0.66:5180/logo/CCTV-6.png" group-title="Kênh Trung Quốc",CCTV-6
 http://[2409:8087:8:21::18]:6610/otttv.bj.chinamobile.com/PLTV/88888888/224/3221226468/1.m3u8?
-#EXTINF:-1 tvg-id="CCTV-7" tvg-name="CCTV-7" tvg-logo="http://10.1.0.208:5180/logo/CCTV-7.png" group-title="Kênh Trung Quốc",CCTV-7
+#EXTINF:-1 tvg-id="CCTV-7" tvg-name="CCTV-7" tvg-logo="http://10.1.0.66:5180/logo/CCTV-7.png" group-title="Kênh Trung Quốc",CCTV-7
 http://[2409:8087:8:21::18]:6610/otttv.bj.chinamobile.com/PLTV/88888888/224/3221226946/1.m3u8?
-#EXTINF:-1 tvg-id="CCTV-8" tvg-name="CCTV-8" tvg-logo="http://10.1.0.208:5180/logo/CCTV-8.png" group-title="Kênh Trung Quốc",CCTV-8
+#EXTINF:-1 tvg-id="CCTV-8" tvg-name="CCTV-8" tvg-logo="http://10.1.0.66:5180/logo/CCTV-8.png" group-title="Kênh Trung Quốc",CCTV-8
 http://[2409:8087:8:21::18]:6610/otttv.bj.chinamobile.com/PLTV/88888888/224/3221226485/1.m3u8?
-#EXTINF:-1 tvg-id="CCTV-9" tvg-name="CCTV-9" tvg-logo="http://10.1.0.208:5180/logo/CCTV-9.png" group-title="Kênh Trung Quốc",CCTV-9
+#EXTINF:-1 tvg-id="CCTV-9" tvg-name="CCTV-9" tvg-logo="http://10.1.0.66:5180/logo/CCTV-9.png" group-title="Kênh Trung Quốc",CCTV-9
 https://xykt-fix.github.io/Y77.m3u8
-#EXTINF:-1 tvg-id="CCTV-9" tvg-name="CCTV-9" tvg-logo="http://10.1.0.208:5180/logo/CCTV-9.png" group-title="Kênh Trung Quốc",CCTV-9
+#EXTINF:-1 tvg-id="CCTV-9" tvg-name="CCTV-9" tvg-logo="http://10.1.0.66:5180/logo/CCTV-9.png" group-title="Kênh Trung Quốc",CCTV-9
 http://[2409:8087:8:21::18]:6610/otttv.bj.chinamobile.com/PLTV/88888888/224/3221226944/1.m3u8?
-#EXTINF:-1 tvg-id="CCTV-10" tvg-name="CCTV-10" tvg-logo="http://10.1.0.208:5180/logo/CCTV-10.png" group-title="Kênh Trung Quốc",CCTV-10
+#EXTINF:-1 tvg-id="CCTV-10" tvg-name="CCTV-10" tvg-logo="http://10.1.0.66:5180/logo/CCTV-10.png" group-title="Kênh Trung Quốc",CCTV-10
 http://[2409:8087:8:21::18]:6610/otttv.bj.chinamobile.com/PLTV/88888888/224/3221226937/1.m3u8?
-#EXTINF:-1 tvg-id="CCTV-11" tvg-name="CCTV-11" tvg-logo="http://10.1.0.208:5180/logo/CCTV-11.png" group-title="Kênh Trung Quốc",CCTV-11
+#EXTINF:-1 tvg-id="CCTV-11" tvg-name="CCTV-11" tvg-logo="http://10.1.0.66:5180/logo/CCTV-11.png" group-title="Kênh Trung Quốc",CCTV-11
 https://xykt-fix.github.io/play/a02b/index.m3u8
-#EXTINF:-1 tvg-id="CCTV-11" tvg-name="CCTV-11" tvg-logo="http://10.1.0.208:5180/logo/CCTV-11.png" group-title="Kênh Trung Quốc",CCTV-11
+#EXTINF:-1 tvg-id="CCTV-11" tvg-name="CCTV-11" tvg-logo="http://10.1.0.66:5180/logo/CCTV-11.png" group-title="Kênh Trung Quốc",CCTV-11
 http://[2409:8087:8:21::18]:6610/otttv.bj.chinamobile.com/PLTV/88888888/224/3221226334/1.m3u8?
-#EXTINF:-1 tvg-id="CCTV-12" tvg-name="CCTV-12" tvg-logo="http://10.1.0.208:5180/logo/CCTV-12.png" group-title="Kênh Trung Quốc",CCTV-12
+#EXTINF:-1 tvg-id="CCTV-12" tvg-name="CCTV-12" tvg-logo="http://10.1.0.66:5180/logo/CCTV-12.png" group-title="Kênh Trung Quốc",CCTV-12
 http://[2409:8087:8:21::18]:6610/otttv.bj.chinamobile.com/PLTV/88888888/224/3221226942/1.m3u8?
-#EXTINF:-1 tvg-id="CCTV-13" tvg-name="CCTV-13" tvg-logo="http://10.1.0.208:5180/logo/CCTV-13.png" group-title="Kênh Trung Quốc",CCTV-13
+#EXTINF:-1 tvg-id="CCTV-13" tvg-name="CCTV-13" tvg-logo="http://10.1.0.66:5180/logo/CCTV-13.png" group-title="Kênh Trung Quốc",CCTV-13
 https://cdn3.163189.xyz/163189/cctv13
-#EXTINF:-1 tvg-id="CCTV-13" tvg-name="CCTV-13" tvg-logo="http://10.1.0.208:5180/logo/CCTV-13.png" group-title="Kênh Trung Quốc",CCTV-13
+#EXTINF:-1 tvg-id="CCTV-13" tvg-name="CCTV-13" tvg-logo="http://10.1.0.66:5180/logo/CCTV-13.png" group-title="Kênh Trung Quốc",CCTV-13
 http://[2409:8087:8:21::18]:6610/otttv.bj.chinamobile.com/PLTV/88888888/224/3221226316/1.m3u8?
-#EXTINF:-1 tvg-id="CCTV-14" tvg-name="CCTV-14" tvg-logo="http://10.1.0.208:5180/logo/CCTV-14.png" group-title="Kênh Trung Quốc",CCTV-14
+#EXTINF:-1 tvg-id="CCTV-14" tvg-name="CCTV-14" tvg-logo="http://10.1.0.66:5180/logo/CCTV-14.png" group-title="Kênh Trung Quốc",CCTV-14
 http://[2409:8087:8:21::18]:6610/otttv.bj.chinamobile.com/PLTV/88888888/224/3221226947/1.m3u8?
-#EXTINF:-1 tvg-id="CCTV-15" tvg-name="CCTV-15" tvg-logo="http://10.1.0.208:5180/logo/CCTV-15.png" group-title="Kênh Trung Quốc",CCTV-15
+#EXTINF:-1 tvg-id="CCTV-15" tvg-name="CCTV-15" tvg-logo="http://10.1.0.66:5180/logo/CCTV-15.png" group-title="Kênh Trung Quốc",CCTV-15
 https://xykt-fix.github.io/play/a02e/index.m3u8
-#EXTINF:-1 tvg-id="CCTV-15" tvg-name="CCTV-15" tvg-logo="http://10.1.0.208:5180/logo/CCTV-15.png" group-title="Kênh Trung Quốc",CCTV-15
+#EXTINF:-1 tvg-id="CCTV-15" tvg-name="CCTV-15" tvg-logo="http://10.1.0.66:5180/logo/CCTV-15.png" group-title="Kênh Trung Quốc",CCTV-15
 http://[2409:8087:8:21::18]:6610/otttv.bj.chinamobile.com/PLTV/88888888/224/3221226333/1.m3u8?
