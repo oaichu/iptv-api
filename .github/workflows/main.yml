@@ -37,218 +37,40 @@ jobs:
       - name: Install dependencies
         run: pipenv --python 3.13 && pipenv install --deploy
 
+      - name: Show config info
+        run: |
+          echo "===== config/config.ini ====="
+          cat config/config.ini || true
+          echo ""
+          echo "===== subscribe.txt ====="
+          cat config/subscribe.txt || true
+          echo ""
+          echo "===== Tổng số kênh trong user_demo.txt ====="
+          grep -v '^[[:space:]]*$' config/user_demo.txt | grep -v '#genre#' | wc -l || true
+
       - name: Update IPTV playlist
         run: pipenv run dev
 
-      - name: Clean & Precise Channel Grouping
+      - name: Post-process M3U (Dịch tiếng Trung còn sót)
         run: |
           if [ ! -f output/user_result.m3u ]; then
             echo "Không tìm thấy output/user_result.m3u"
+            find output -maxdepth 3 -type f || true
             exit 1
           fi
 
-          # Dọn dẹp cơ bản
           sed -i 's/\$订阅源//g' output/user_result.m3u
           sed -i 's/未匹配频道/Kênh Chưa Phân Loại/g' output/user_result.m3u
           sed -i 's/无结果频道/Kênh Lỗi - Không Chạy/g' output/user_result.m3u
           sed -i 's/更新时间/Thời Gian Cập Nhật/g' output/user_result.m3u
 
-          python3 <<'PY'
-          import re
-          from pathlib import Path
-
-          path = Path("output/user_result.m3u")
-          if not path.exists():
-              print("LỖI: Không tìm thấy file M3U sau khi dọn dẹp.")
-              exit(1)
-
-          text = path.read_text(encoding="utf-8", errors="ignore")
-
-          # ============================================================
-          # QUY TẮC PHÂN NHÓM MỚI (ưu tiên khớp CHÍNH XÁC, không chồng lấn)
-          # Mỗi nhóm là một tuple: (Tên_Nhóm, [danh_sách_pattern])
-          # Thứ tự nhóm QUAN TRỌNG: nhóm càng đặc thù càng đặt lên trên
-          # để tránh bị nhóm tổng quát hơn "hớt" mất.
-          # ============================================================
-
-          groups = [
-              # --- A. Nhóm đặc thù dựa trên tên riêng (ưu tiên cao nhất) ---
-
-              # 1. THỂ THAO QUỐC TẾ (ESPN, Sky, beIN, v.v.)
-              ("12. Thể Thao Quốc Tế", [
-                  r"\bESPN\b", r"\bFox\s?Sports\b", r"\bSky\s?Sports\b",
-                  r"\bbeIN\s?Sports?\b", r"\bEurosport\b", r"\bDAZN\b",
-                  r"\bCBS\s?Sports\b", r"\bTNT\s?Sports\b", r"\bBT\s?Sport\b",
-                  r"Premier\s?League\s?TV", r"UEFA\s?Champions\s?League",
-                  r"\bNBA\s?TV\b", r"\bNFL\s?Network\b", r"\bMLB\s?Network\b",
-                  r"\bGolf\s?Channel\b", r"\bWWE\b", r"\bUFC\b", r"\bFight\s?Sports\b",
-                  r"\bSuperSport\b"
-              ]),
-
-              # 2. KÊNH TRUNG QUỐC (Bắt buộc phải tách riêng để không lẫn vào VN/Quốc Tế)
-              ("18. Kênh Trung Quốc", [
-                  r"\bCCTV[-\s]?\d+\b", r"\bCGTN\b", r"\bDragon\s?TV\b",
-                  r"\bHunan\s?TV\b", r"\bJiangsu\s?TV\b", r"\bZhejiang\s?TV\b",
-                  r"\bPhoenix\s?TV\b", r"\bShenzhen\s?TV\b", r"\bGuangdong\s?TV\b",
-                  r"\bBeijing\s?TV\b", r"\bShanghai\s?TV\b"
-              ]),
-
-              # 3. VTVcab (có ON Sports, ON Movies...) - phải ưu tiên trước VTV thường
-              ("06. VTVcab - Truyền Hình Cáp Việt Nam", [
-                  r"\bVTV\s?[Cc]ab\b", r"\bVTVcab\b",
-                  r"\bON\s?Sports\b", r"\bON\s?Football\b", r"\bON\s?Golf\b",
-                  r"\bON\s?Movies\b", r"\bON\s?Music\b", r"\bON\s?Kids\b",
-                  r"\bON\s?Vie\b", r"\bON\s?Cine\b", r"\bON\s?Trending\b",
-                  r"\bON\s?E\s?Channel\b"
-              ]),
-
-              # 4. K+ (tránh lẫn với các kênh khác)
-              ("09. K Plus", [
-                  r"\bK\+\b", r"\bKPlus\b", r"K\+\s?Sport", r"K\+\s?Cine", r"K\+\s?Life",
-                  r"K\+\s?Kids", r"K\+\s?Action", r"K\+\s?NS", r"K\+\s?PM"
-              ]),
-
-              # 5. SCTV
-              ("07. SCTV", [
-                  r"\bSCTV\s?\d+\b", r"SCTV\s?Phim", r"SCTV\s?Thể\s?Thao",
-                  r"SCTV\s?Sports", r"SCTV\s?Ca\s?Nhạc", r"SCTV\s?Thiếu\s?Nhi"
-              ]),
-
-              # 6. FPT
-              ("08. FPT Play - FPT TV", [
-                  r"\bFPT\s?(Play|TV)\b", r"\bFPT\b"
-              ]),
-
-              # 7. HTV (tránh lẫn với THVL hay các đài địa phương khác có chữ "TV")
-              ("02. HTV - TP.HCM", [
-                  r"\bHTV\s?[1-9]\b", r"\bHTVC\b", r"\bHTV\s?Key\b",
-                  r"\bHTV\s?Thể\s?Thao\b", r"\bHTV\s?Sports\b"
-              ]),
-
-              # 8. THỂ THAO VIỆT NAM (đặt sau các đài để không hớt tên đài)
-              ("11. Thể Thao Việt Nam", [
-                  r"\bBóng\s?Đá\s?TV\b", r"\bThể\s?Thao\s?TV\b",
-                  r"\bVTV\s?6\b", r"\bVTV6\b"
-              ]),
-
-              # 9. VTV (CHỈ các kênh VTV1-10, nhưng LOẠI TRỪ VTV6 & VTV7 & VTVcab)
-              # Dùng regex loại trừ (negative lookahead) để không bắt VTVcab, VTV6, VTV7
-              ("01. VTV - Kênh Quốc Gia", [
-                  r"\bVTV\s?(1|2|3|4|5|8|9|10)\b",
-                  r"\bVTV1\b", r"\bVTV2\b", r"\bVTV3\b", r"\bVTV4\b", r"\bVTV5\b",
-                  r"\bVTV8\b", r"\bVTV9\b", r"\bVTV10\b"
-              ]),
-
-              # 10. THIẾU NHI (ưu tiên cao hơn Địa Phương / Giải trí)
-              ("15. Thiếu Nhi - Giáo Dục", [
-                  r"\bVTV\s?7\b", r"\bHTV\s?3\b", r"\bON\s?Kids\b", r"\bK\+\s?Kids\b",
-                  r"\bCartoon\s?Network\b", r"\bDisney\b", r"\bNickelodeon\b",
-                  r"\bBaby\s?TV\b", r"\bCBeebies\b", r"\bDa\s?Vinci\b",
-                  r"\bThiếu\s?Nhi\b", r"\bGiáo\s?Dục\b"
-              ]),
-
-              # --- B. Nhóm địa phương (dùng tên tỉnh/thành cụ thể) ---
-
-              ("03. Địa Phương - Miền Bắc", [
-                  r"\bHà\s?Nội\b", r"\bHa\s?Noi\b", r"\bHanoi\b",
-                  r"\bHải\s?Phòng\b", r"\bQuảng\s?Ninh\b",
-                  r"\bBắc\s?Ninh\b", r"\bBắc\s?Giang\b", r"\bHải\s?Dương\b",
-                  r"\bHưng\s?Yên\b", r"\bThái\s?Bình\b", r"\bNam\s?Định\b",
-                  r"\bNinh\s?Bình\b", r"\bThanh\s?Hóa\b", r"\bNghệ\s?An\b",
-                  r"\bHà\s?Tĩnh\b", r"\bTuyên\s?Quang\b", r"\bLào\s?Cai\b",
-                  r"\bYên\s?Bái\b", r"\bPhú\s?Thọ\b", r"\bThái\s?Nguyên\b",
-                  r"\bCao\s?Bằng\b", r"\bBắc\s?Kạn\b", r"\bLạng\s?Sơn\b",
-                  r"\bĐiện\s?Biên\b", r"\bLai\s?Châu\b", r"\bSơn\s?La\b",
-                  r"\bHòa\s?Bình\b"
-              ]),
-
-              ("04. Địa Phương - Miền Trung", [
-                  r"\bQuảng\s?Bình\b", r"\bQuảng\s?Trị\b", r"\bHuế\b",
-                  r"\bĐà\s?Nẵng\b", r"\bQuảng\s?Nam\b", r"\bQuảng\s?Ngãi\b",
-                  r"\bBình\s?Định\b", r"\bPhú\s?Yên\b", r"\bKhánh\s?Hòa\b",
-                  r"\bNinh\s?Thuận\b", r"\bBình\s?Thuận\b", r"\bKon\s?Tum\b",
-                  r"\bGia\s?Lai\b", r"\bĐắk\s?Lắk\b", r"\bĐắk\s?Nông\b", r"\bLâm\s?Đồng\b"
-              ]),
-
-              ("05. Địa Phương - Miền Nam", [
-                  r"\bTHVL\b", r"\bTHĐT\b", r"\bTHAG\b", r"\bTHKG\b",
-                  r"\bTHLA\b", r"\bTHBT\b", r"\bTHTG\b", r"\bTHTPCT\b",
-                  r"\bBình\s?Dương\b", r"\bĐồng\s?Nai\b",
-                  r"\bBà\s?Rịa\b", r"\bVũng\s?Tàu\b", r"\bLong\s?An\b",
-                  r"\bTiền\s?Giang\b", r"\bBến\s?Tre\b", r"\bTrà\s?Vinh\b",
-                  r"\bĐồng\s?Tháp\b", r"\bAn\s?Giang\b", r"\bKiên\s?Giang\b",
-                  r"\bCần\s?Thơ\b", r"\bHậu\s?Giang\b", r"\bSóc\s?Trăng\b",
-                  r"\bBạc\s?Liêu\b", r"\bCà\s?Mau\b", r"\bTây\s?Ninh\b",
-                  r"\bBình\s?Phước\b"
-              ]),
-
-              # --- C. Nhóm theo nội dung (đặt sau để tránh hớt tên riêng) ---
-
-              ("10. Tin Tức - Thời Sự", [
-                  r"\bCNN\b", r"\bBBC\s?World\b", r"\bFrance\s?24\b",
-                  r"\bEuronews\b", r"\bAl\s?Jazeera\b", r"\bCNBC\b",
-                  r"\bBloomberg\b", r"\bCNA\b", r"\bNHK\s?World\b",
-                  r"\bArirang\b", r"\bVNews\b", r"\bANTV\b", r"\bQPVN\b",
-                  r"\bQuốc\s?Hội\b", r"\bNhân\s?Dân\b"
-              ]),
-
-              ("13. Phim - Series", [
-                  r"\bHBO\b", r"\bCinemax\b", r"\bStar\s?Movies\b",
-                  r"\bAXN\b", r"\bWarner\s?TV\b", r"\bHollywood\b",
-                  r"\bBox\s?Movie\b", r"\bKix\b", r"\bBlue\s?Ant\b",
-                  r"\bPhim\b", r"\bMovies\b", r"\bCine\b"
-              ]),
-
-              ("14. Giải Trí - Tổng Hợp", [
-                  r"\bYeah1\b", r"\bTodayTV\b", r"\bVie\s?(Channel|Giải\s?Trí)\b",
-                  r"\bEntertainment\b", r"\bGeneral\b"
-              ]),
-
-              ("16. Khoa Học - Khám Phá", [
-                  r"\bDiscovery\b", r"\bAnimal\s?Planet\b", r"\bNational\s?Geographic\b",
-                  r"\bHistory\b", r"\bBBC\s?Earth\b", r"\bTLC\b", r"\bTravel\s?Channel\b"
-              ]),
-
-              ("17. Âm Nhạc", [
-                  r"\bMTV\b", r"\bChannel\s?V\b", r"\bMusic\b", r"\biTV\b"
-              ]),
-
-              # 19. Quốc Tế (chỉ các kênh còn sót lại không thuộc các nhóm trên)
-              ("19. Kênh Quốc Tế", [
-                  r"\bTV5Monde\b", r"\bDW\b", r"\bRT\b", r"\bTRT\s?World\b",
-                  r"\bKBS\s?World\b", r"\bABC\s?News\b", r"\bCBS\s?News\b",
-                  r"\bNBC\s?News\b", r"\bFox\s?News\b"
-              ]),
-          ]
-
-          def detect_group(line):
-              # Duyệt theo thứ tự, nhóm nào khớp trước thì lấy
-              for group_name, patterns in groups:
-                  for pat in patterns:
-                      if re.search(pat, line, flags=re.IGNORECASE):
-                          return group_name
-              return "20. Kênh Chưa Phân Loại"
-
-          output_lines = []
-          for line in text.splitlines():
-              if line.startswith("#EXTINF"):
-                  group = detect_group(line)
-                  if 'group-title="' in line:
-                      line = re.sub(r'group-title="[^"]*"', f'group-title="{group}"', line)
-                  else:
-                      line = line.replace("#EXTINF:-1", f'#EXTINF:-1 group-title="{group}"', 1)
-              output_lines.append(line)
-
-          path.write_text("\n".join(output_lines) + "\n", encoding="utf-8")
-
-          # In thống kê
-          print("\n===== KẾT QUẢ SAU KHI PHÂN NHÓM =====")
-          import subprocess
-          total = subprocess.run(['grep', '-c', '^#EXTINF', str(path)], capture_output=True, text=True).stdout.strip()
-          print(f"Tổng số kênh: {total}")
-          print("\nPhân bổ theo nhóm:")
-          subprocess.run(['bash', '-c', 'grep "^#EXTINF" output/user_result.m3u | sed -n \'s/.*group-title="\\([^"]*\\)".*/\\1/p\' | sort | uniq -c | sort -rn'], capture_output=False)
-          PY
+          echo ""
+          echo "===== KẾT QUẢ ====="
+          echo "Tổng số kênh trong M3U:"
+          grep -c '^#EXTINF' output/user_result.m3u || true
+          echo ""
+          echo "Phân bổ theo nhóm:"
+          grep '^#EXTINF' output/user_result.m3u | sed -n 's/.*group-title="\([^"]*\)".*/\1/p' | sort | uniq -c | sort -rn || true
 
       - name: Commit and push if changed
         run: |
@@ -256,7 +78,7 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git add .
           if ! git diff --staged --quiet; then
-            git commit -m "Fix precise channel grouping logic"
+            git commit -m "Auto Updated IPTV Playlist"
             git push --force
           fi
           
