@@ -1,41 +1,3 @@
-name: 'Update schedule'
-
-on:
-  workflow_dispatch:
-  schedule:
-    - cron: '0 */12 * * *'
-
-jobs:
-  push:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Set branch name
-        run: echo "BRANCH_NAME=${{ github.repository_owner == 'Guovin' && 'gd' || 'master' }}" >> $GITHUB_ENV
-
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ env.BRANCH_NAME }}
-
-      - name: Set up Python 3.13
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.13'
-          cache: 'pipenv'
-
-      - name: Install FFmpeg
-        run: sudo apt-get update && sudo apt-get install -y ffmpeg
-
-      - name: Install pipenv
-        run: pip3 install --user pipenv
-
-      - name: Install dependencies
-        run: pipenv --python 3.13 && pipenv install --deploy
-
-      - name: Update IPTV playlist
-        run: pipenv run dev
-
       - name: Create Ultimate Anti-Duplicate Script
         run: |
           cat << 'PYEOF' > filter.py
@@ -52,23 +14,29 @@ jobs:
 
           def clean_text_for_match(text):
               if not text: return ""
-              t = str(text)
+              t = str(text).strip()
+              
+              # Loại bỏ các tag không cần thiết
               t = re.sub(r'[\(\[【].*?[\)\]】]', '', t)
               t = remove_chinese(t)
-              # GIỮ LẠI chữ HD để phân biệt chính xác VTV1 và VTV1 HD
-              t = re.sub(r'(?i)\b(fhd|1080p|720p|2k|4k|8k|uhd|hevc|h264|h265|live|backup|du phong|dự phòng|test|vn|vietnam|geo-blocked)\b', '', t)
-              t = re.sub(r'[^\w\s\+\-]', '', t, flags=re.UNICODE)
+              
+              # Giữ HD, Tây Nam Bộ, Tây Nguyên...
+              t = re.sub(r'(?i)\b(fhd|1080p|720p|2k|4k|8k|uhd|hevc|h264|h265|live|backup|du phong|dự phòng|test|vn|vietnam|geo-blocked|stream)\b', '', t)
+              
+              t = re.sub(r'[^\w\s\+\-]', ' ', t, flags=re.UNICODE)
               t = re.sub(r'\s+', ' ', t).strip().lower()
-              t = re.sub(r'\b(vtv|htv|sctv|vtvcab|k\+)\s+(\d+)\b', r'\1\2', t)
+              
+              # Chuẩn hóa VTV, HTV, SCTV...
+              t = re.sub(r'\b(vtv|htv|sctv|vtvcab|k\+?|k plus)\s*(\d+)', r'\1\2', t)
               return t
 
           # ==========================================
-          # 1. NẠP KHUÔN ĐÚC TỪ FILE DEMO CỦA UER
+          # 1. LOAD DEMO STRUCTURE
           # ==========================================
           demo_path = Path("config/user_demo.txt")
           group_order = []
           demo_structure = {}
-
+          
           if demo_path.exists():
               current_group = None
               with open(demo_path, "r", encoding="utf-8", errors="ignore") as f:
@@ -80,11 +48,10 @@ jobs:
                           if current_group not in group_order:
                               group_order.append(current_group)
                               demo_structure[current_group] = []
-                      elif current_group:
-                          if line not in demo_structure[current_group]:
-                              demo_structure[current_group].append(line)
+                      elif current_group and line not in demo_structure[current_group]:
+                          demo_structure[current_group].append(line)
 
-          # Tạo bản đồ từ khóa tìm kiếm chính xác
+          # Tạo search map với nhiều mức độ clean
           search_map = []
           for grp in group_order:
               for ch in demo_structure[grp]:
@@ -93,60 +60,68 @@ jobs:
                       search_map.append({
                           'clean': clean_c,
                           'original': ch,
-                          'group': grp
+                          'group': grp,
+                          'len': len(clean_c)
                       })
-          # Ưu tiên sắp xếp từ khóa DÀI NHẤT lên trước (VTV5 Tây Nam Bộ check trước VTV5, VTV1 HD check trước VTV1)
-          search_map.sort(key=lambda x: len(x['clean']), reverse=True)
+
+          # Sắp xếp: dài nhất trước
+          search_map.sort(key=lambda x: x['len'], reverse=True)
 
           # ==========================================
-          # 2. PHÂN TÍCH VÀ ĐỐI SOÁT FILE M3U ĐẦU RA
+          # 2. XỬ LÝ M3U
           # ==========================================
           m3u_path = Path(m3u_file_path)
           lines = m3u_path.read_text(encoding="utf-8", errors="ignore").replace("$订阅源", "").splitlines()
 
-          # Khởi tạo kết quả rỗng cho từng slot kênh chuẩn trong demo
           results = {grp: {ch: None for ch in demo_structure[grp]} for grp in group_order}
           seen_urls = set()
-
           current_extinf = None
+
           for line in lines:
               line = line.strip()
-              if not line: continue
-              if line.startswith("#EXTM3U"): continue
+              if not line or line.startswith("#EXTM3U"): continue
               
               if line.startswith("#EXTINF"):
                   current_extinf = line
-              elif current_extinf:
+                  continue
+              
+              if current_extinf:
                   url = line
-                  if "更新时间" in current_extinf or "Thời Gian" in current_extinf or url in seen_urls:
+                  if url in seen_urls or any(x in current_extinf for x in ["更新时间", "Thời Gian", "更新"]):
                       current_extinf = None
                       continue
-                  
-                  parts = current_extinf.split(",")
+
+                  parts = current_extinf.split(",", 1)
                   raw_name = parts[-1].strip() if len(parts) > 1 else ""
                   
+                  # Lấy tvg-id nếu tên bị lỗi
                   if re.match(r'^\d{4}-\d{2}-\d{2}', raw_name):
                       m = re.search(r'tvg-id="([^"]*)"', current_extinf)
                       if m: raw_name = m.group(1)
-                  
+
                   clean_m3u = clean_text_for_match(raw_name)
-                  
-                  # THUẬT TOÁN ĐỊNH VỊ ĐÍCH DANH (BẢO VỆ SLOT KÊNH)
-                  best_match_item = None
+                  if not clean_m3u:
+                      current_extinf = None
+                      continue
+
+                  # Matching
+                  best_match = None
                   for item in search_map:
-                      # Kiểm tra khớp từ đầu chuỗi chuẩn xác kèm ranh giới từ ký tự
-                      pattern = r'^' + re.escape(item['clean']) + r'(?:\s|-|$)'
-                      if re.match(pattern, clean_m3u):
-                          best_match_item = item
-                          break # Vì danh sách đã xếp từ dài đến ngắn, tìm thấy thằng dài nhất là dừng ngay
-                  
-                  # Nếu tìm thấy đích danh chủ nhân của luồng phát này
-                  if best_match_item:
-                      grp = best_match_item['group']
-                      ch = best_match_item['original']
+                      clean_demo = item['clean']
+                      # Cách 1: Khớp chính xác hoặc bắt đầu
+                      if clean_m3u == clean_demo or clean_m3u.startswith(clean_demo + " "):
+                          best_match = item
+                          break
+                      # Cách 2: Khớp từ (cho trường hợp dài dòng)
+                      if len(clean_demo) > 8 and clean_demo in clean_m3u:
+                          best_match = item
+                          break
+
+                  if best_match:
+                      grp = best_match['group']
+                      ch = best_match['original']
                       
-                      # 🛑 CHỈ LẤY LINK ĐẦU TIÊN (LINK CHẠY NHANH NHẤT), HỦY TOÀN BỘ LINK DỰ PHÒNG SAU ĐÓ
-                      if results[grp][ch] is None:
+                      if results[grp][ch] is None:   # Chỉ lấy link đầu tiên (nhanh nhất)
                           base = parts[0]
                           if 'group-title="' in base:
                               base = re.sub(r'group-title="[^"]*"', f'group-title="{grp}"', base)
@@ -155,42 +130,31 @@ jobs:
                           
                           results[grp][ch] = (f"{base},{ch}", url)
                           seen_urls.add(url)
-                  
+
                   current_extinf = None
 
           # ==========================================
-          # 3. XUẤT FILE M3U SẠCH SẼ THEO ĐÚNG THỨ TỰ DEMO
+          # 3. XUẤT FILE
           # ==========================================
           output_lines = ["#EXTM3U"]
           total = 0
+          missing = []
 
           for grp in group_order:
+              output_lines.append(f"{grp},#genre#")
               for ch in demo_structure[grp]:
                   if results[grp][ch] is not None:
                       extinf, url = results[grp][ch]
                       output_lines.append(extinf)
                       output_lines.append(url)
                       total += 1
+                  else:
+                      missing.append(f"  • {grp} → {ch}")
 
           Path("output/user_result.m3u").write_text("\n".join(output_lines) + "\n", encoding="utf-8")
-          print(f"TONG SO KÊNH ĐÃ KHỚP KHUÔN ĐÚC THÀNH CÔNG: {total}")
+
+          print(f"✅ TỔNG SỐ KÊNH KHỚP: {total}/{sum(len(chs) for chs in demo_structure.values())}")
+          if missing:
+              print(f"⚠️  Thiếu {len(missing)} kênh:")
+              print("\n".join(missing[:30]))  # chỉ in 30 kênh đầu
           PYEOF
-
-      - name: Run Filter
-        run: |
-          if [ -f output/user_result.m3u ]; then
-            python3 filter.py output/user_result.m3u
-          elif [ -f output/result.m3u ]; then
-            cp output/result.m3u output/user_result.m3u
-            python3 filter.py output/user_result.m3u
-          fi
-
-      - name: Commit and push if changed
-        run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git add .
-          if ! git diff --staged --quiet; then
-            git commit -m "Strict 1-to-1 match avoiding prefix backup pollution"
-            git push --force
-          fi
