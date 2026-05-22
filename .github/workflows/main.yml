@@ -38,199 +38,145 @@ jobs:
           if [ -f config/user_config.ini ]; then
             cp config/user_config.ini config/config.ini
             echo "Da ap dung user_config.ini"
-          else
-            echo "WARNING: Khong tim thay user_config.ini, dung mac dinh"
           fi
 
       - name: Update IPTV playlist
         run: pipenv run dev
 
-      - name: Post-process M3U Filter
+      - name: Create Python Filter Script
         run: |
-          # Tự động tìm file M3U (dù tool xuất ra tên gì)
+          cat << 'PYEOF' > filter.py
+          import re
+          from pathlib import Path
+          import sys
+
+          m3u_file_path = sys.argv[1] if len(sys.argv) > 1 else ""
+          if not m3u_file_path or not Path(m3u_file_path).exists():
+              print("Khong co file M3U de xu ly.")
+              sys.exit(0)
+
+          def remove_chinese(text):
+              return re.sub(r'[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff\u3000-\u303f\uff00-\uffef]', '', text).strip()
+
+          def clean_name(text):
+              if not text: return ""
+              t = text.lower().strip()
+              tags = re.findall(r'[\(\[](.*?)[\)\]]', t)
+              quality_tag = ""
+              for tag in tags:
+                  if re.search(r'(?i)\b(fhd|hd|4k|8k|1080p|2k|uhd)\b', tag): quality_tag = " hd"; break
+                  elif re.search(r'(?i)\b(sd|720p)\b', tag): quality_tag = " sd"
+              t = re.sub(r'[\(\[].*?[\)\]]', '', t)
+              t = re.sub(r'(?i)\b(fhd|4k|8k|1080p|2k|uhd)\b', 'hd', t)
+              t = re.sub(r'(?i)\b(sd|720p)\b', 'sd', t)
+              if quality_tag == " hd" and "hd" not in t: t += " hd"
+              elif quality_tag == " sd" and "sd" not in t and "hd" not in t: t += " sd"
+              t = re.sub(r'(?i)\b(hevc|h264|h265|live|backup|du phong)\b', '', t)
+              t = remove_chinese(t)
+              t = re.sub(r'[^\w\s\+\-]', '', t, flags=re.UNICODE)
+              t = re.sub(r'([a-z])\s+(\d)', r'\1\2', t)
+              t = re.sub(r'(\d)\s+([a-z])', r'\1\2', t)
+              return re.sub(r'\s+', ' ', t).strip('+- ')
+
+          demo_path = Path("config/user_demo.txt")
+          groups_order, channels_in_group, current_group = [], {}, None
+          if demo_path.exists():
+              with open(demo_path, "r", encoding="utf-8", errors="ignore") as f:
+                  for line in f:
+                      line = line.strip()
+                      if not line: continue
+                      if line.endswith("#genre#"):
+                          current_group = line.replace(",#genre#", "").strip()
+                          if current_group not in groups_order:
+                              groups_order.append(current_group)
+                              channels_in_group[current_group] = []
+                      elif current_group: channels_in_group[current_group].append(line)
+
+          position_map = {}
+          for grp in groups_order:
+              for idx, ch_name in enumerate(channels_in_group[grp]):
+                  clean = clean_name(ch_name)
+                  if clean and clean not in position_map: position_map[clean] = (grp, idx, ch_name)
+
+          m3u_path = Path(m3u_file_path)
+          lines = m3u_path.read_text(encoding="utf-8", errors="ignore").replace("$订阅源", "").splitlines()
+          grouped, unmatched, seen_urls = {grp: [] for grp in groups_order}, [], set()
+          current_extinf = None
+          
+          for line in lines[1:] if lines and lines[0].startswith("#EXTM3U") else lines:
+              line = line.strip()
+              if not line: continue
+              if line.startswith("#EXTINF"): current_extinf = line
+              elif current_extinf:
+                  url = line
+                  if url not in seen_urls:
+                      parts = current_extinf.split(",")
+                      raw_name = parts[-1].strip() if len(parts) > 1 else ""
+                      if re.match(r'^\d{4}-\d{2}-\d{2}', raw_name):
+                          m = re.search(r'tvg-id="([^"]*)"', current_extinf)
+                          raw_name = m.group(1) if m else raw_name
+                      
+                      display_name = remove_chinese(raw_name).strip()
+                      if not display_name: display_name = raw_name
+                      clean_display = clean_name(display_name)
+                      
+                      matched_grp, matched_idx, matched_demo_name = None, None, None
+                      if clean_display in position_map:
+                          matched_grp, matched_idx, matched_demo_name = position_map[clean_display]
+                      else:
+                          for dc in sorted(position_map.keys(), key=len, reverse=True):
+                              if len(dc) >= 3 and (clean_display == dc or clean_display.startswith(dc + " ") or clean_display.endswith(" " + dc) or (" " + dc + " ") in (" " + clean_display + " ")):
+                                  matched_grp, matched_idx, matched_demo_name = position_map[dc]
+                                  break
+                      
+                      if matched_grp:
+                          seen_urls.add(url)
+                          base_info = parts[0]
+                          if 'group-title="' in base_info: base_info = re.sub(r'group-title="[^"]*"', f'group-title="{matched_grp}"', base_info)
+                          else: base_info = base_info.replace("#EXTINF:-1", f'#EXTINF:-1 group-title="{matched_grp}"', 1)
+                          grouped[matched_grp].append((matched_idx, f"{base_info},{matched_demo_name}", url))
+                      else: unmatched.append((current_extinf, url))
+                  current_extinf = None
+
+          output_lines, total = ['#EXTM3U'], 0
+          for grp in groups_order:
+              ch_links = {}
+              for idx, ext, url in sorted(grouped[grp], key=lambda x: x[0]):
+                  ch = ext.split(",")[-1]
+                  if ch not in ch_links: ch_links[ch] = []
+                  if len(ch_links[ch]) < 3: ch_links[ch].append((ext, url))
+              for links in ch_links.values():
+                  for ext, url in links: output_lines.extend([ext, url]); total += 1
+
+          if unmatched:
+              valid, seen_u = [], set()
+              for ext, url in unmatched:
+                  if url in seen_u: continue
+                  parts = ext.split(",")
+                  raw = parts[-1].strip() if len(parts) > 1 else ""
+                  c_name = remove_chinese(raw).strip()
+                  if not c_name or len(c_name) < 2: continue
+                  seen_u.add(url)
+                  base = parts[0]
+                  if 'group-title="' not in base: base = base.replace("#EXTINF:-1", '#EXTINF:-1 group-title="Kenh Khac"')
+                  else: base = re.sub(r'group-title="[^"]*"', 'group-title="Kenh Khac"', base)
+                  valid.append((f"{base},{c_name}", url))
+              if valid:
+                  output_lines.append('')
+                  for ext, url in valid: output_lines.extend([ext, url]); total += 1
+
+          Path("output/user_result.m3u").write_text("\n".join(output_lines) + "\n", encoding="utf-8")
+          print(f"TONG SO KENH: {total}")
+          PYEOF
+
+      - name: Run Filter
+        run: |
           if [ -f output/user_result.m3u ]; then
-            M3U_FILE="output/user_result.m3u"
+            python3 filter.py output/user_result.m3u
           elif [ -f output/result.m3u ]; then
-            M3U_FILE="output/result.m3u"
+            python3 filter.py output/result.m3u
           else
-            echo "⚠️ WARNING: Tool chưa xuất ra file M3U nào. Kiểm tra lại config/user_config.ini"
-            ls -la output/
-            M3U_FILE=""
-          fi
-
-          if [ -n "$M3U_FILE" ]; then
-            python3 <<'PY'
-import re
-from pathlib import Path
-import sys
-
-m3u_file_path = sys.argv[1] if len(sys.argv) > 1 else ""
-if not m3u_file_path or not Path(m3u_file_path).exists():
-    print("Khong co file M3U de xu ly, bo qua buoc loc.")
-    sys.exit(0)
-
-def remove_chinese(text):
-    return re.sub(r'[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff\u3000-\u303f\uff00-\uffef]', '', text).strip()
-
-def clean_name(text: str) -> str:
-    if not text: return ""
-    t = text.lower().strip()
-    tags = re.findall(r'[\(\[](.*?)[\)\]]', t)
-    quality_tag = ""
-    for tag in tags:
-        if re.search(r'(?i)\b(fhd|hd|4k|8k|1080p|2k|uhd)\b', tag):
-            quality_tag = " hd"
-            break
-        elif re.search(r'(?i)\b(sd|720p)\b', tag):
-            quality_tag = " sd"
-    t = re.sub(r'[\(\[].*?[\)\]]', '', t)
-    t = re.sub(r'(?i)\b(fhd|4k|8k|1080p|2k|uhd)\b', 'hd', t)
-    t = re.sub(r'(?i)\b(sd|720p)\b', 'sd', t)
-    if quality_tag == " hd" and "hd" not in t: t += " hd"
-    elif quality_tag == " sd" and "sd" not in t and "hd" not in t: t += " sd"
-    t = re.sub(r'(?i)\b(hevc|h264|h265|live|backup|du phong)\b', '', t)
-    t = remove_chinese(t)
-    t = re.sub(r'[^\w\s\+\-]', '', t, flags=re.UNICODE)
-    t = re.sub(r'([a-z])\s+(\d)', r'\1\2', t)
-    t = re.sub(r'(\d)\s+([a-z])', r'\1\2', t)
-    t = t.strip('+- ')
-    t = re.sub(r'\s+', ' ', t)
-    return t.strip()
-
-demo_path = Path("config/user_demo.txt")
-groups_order = []
-channels_in_group = {}
-current_group = None
-
-if demo_path.exists():
-    with open(demo_path, "r", encoding="utf-8", errors="ignore") as f:
-        for line in f:
-            line = line.strip()
-            if not line: continue
-            if line.endswith("#genre#"):
-                current_group = line.replace(",#genre#", "").strip()
-                if current_group not in groups_order:
-                    groups_order.append(current_group)
-                    channels_in_group[current_group] = []
-            else:
-                if current_group:
-                    channels_in_group[current_group].append(line)
-
-position_map = {}
-for grp in groups_order:
-    for idx, ch_name in enumerate(channels_in_group[grp]):
-        clean = clean_name(ch_name)
-        if clean and clean not in position_map:
-            position_map[clean] = (grp, idx, ch_name)
-
-m3u_path = Path(m3u_file_path)
-text = m3u_path.read_text(encoding="utf-8", errors="ignore").replace("$订阅源", "")
-lines = text.splitlines()
-
-grouped = {grp: [] for grp in groups_order}
-unmatched = []
-seen_urls = set()
-start_idx = 1 if (lines and lines[0].startswith("#EXTM3U")) else 0
-
-current_extinf = None
-for i in range(start_idx, len(lines)):
-    line = lines[i].strip()
-    if not line: continue
-    if line.startswith("#EXTINF"):
-        current_extinf = line
-    else:
-        if not current_extinf: continue
-        url = line
-        if url in seen_urls: 
-            current_extinf = None
-            continue
-        
-        parts = current_extinf.split(",")
-        raw_name = parts[-1].strip() if len(parts) > 1 else ""
-        if re.match(r'^\d{4}-\d{2}-\d{2}', raw_name):
-            match_id = re.search(r'tvg-id="([^"]*)"', current_extinf)
-            raw_name = match_id.group(1) if match_id else raw_name
-            
-        display_name = remove_chinese(raw_name)
-        display_name = re.sub(r'\(\s*\)', '', display_name).strip()
-        if not display_name: display_name = raw_name
-        clean_display = clean_name(display_name)
-
-        matched_grp = None
-        matched_idx = None
-        matched_demo_name = None
-
-        if clean_display in position_map:
-            matched_grp, matched_idx, matched_demo_name = position_map[clean_display]
-        else:
-            for demo_clean in sorted(position_map.keys(), key=len, reverse=True):
-                if len(demo_clean) >= 3:
-                    if clean_display == demo_clean or clean_display.startswith(demo_clean + " ") or clean_display.endswith(" " + demo_clean) or (" " + demo_clean + " ") in (" " + clean_display + " "):
-                        matched_grp, matched_idx, matched_demo_name = position_map[demo_clean]
-                        break
-
-        if matched_grp is not None:
-            seen_urls.add(url)
-            base_info = parts[0]
-            if 'group-title="' in base_info:
-                base_info = re.sub(r'group-title="[^"]*"', f'group-title="{matched_grp}"', base_info)
-            else:
-                base_info = base_info.replace("#EXTINF:-1", f'#EXTINF:-1 group-title="{matched_grp}"', 1)
-            grouped[matched_grp].append((matched_idx, f"{base_info},{matched_demo_name}", url))
-        else:
-            unmatched.append((current_extinf, url))
-        current_extinf = None
-
-output_lines = ['#EXTM3U']
-total_channels = 0
-
-for grp in groups_order:
-    sorted_entries = sorted(grouped[grp], key=lambda x: x[0])
-    channel_links = {}
-    for _, extinf_line, url_line in sorted_entries:
-        ch_name = extinf_line.split(",")[-1]
-        if ch_name not in channel_links:
-            channel_links[ch_name] = []
-        if len(channel_links[ch_name]) < 3:
-            channel_links[ch_name].append((extinf_line, url_line))
-    for ch_name, links in channel_links.items():
-        for extinf_line, url_line in links:
-            output_lines.append(extinf_line)
-            output_lines.append(url_line)
-            total_channels += 1
-
-if unmatched:
-    seen_unmatched = set()
-    valid_unmatched = []
-    for extinf, url in unmatched:
-        if url in seen_unmatched: continue
-        parts = extinf.split(",")
-        base_info = parts[0]
-        raw_name = parts[-1].strip() if len(parts) > 1 else ""
-        clean_name_text = remove_chinese(raw_name)
-        clean_name_text = re.sub(r'\(\s*\)', '', clean_name_text).strip()
-        if not clean_name_text or len(clean_name_text) < 2: continue
-        
-        seen_unmatched.add(url)
-        if 'group-title="' not in base_info:
-            base_info = base_info.replace("#EXTINF:-1", '#EXTINF:-1 group-title="Kenh Khac"')
-        else:
-            base_info = re.sub(r'group-title="[^"]*"', 'group-title="Kenh Khac"', base_info)
-        valid_unmatched.append((f"{base_info},{clean_name_text}", url))
-        
-    if valid_unmatched:
-        output_lines.append('')
-        for extinf_line, url_line in valid_unmatched:
-            output_lines.append(extinf_line)
-            output_lines.append(url_line)
-            total_channels += 1
-
-final_path = Path("output/user_result.m3u")
-final_path.write_text("\n".join(output_lines) + "\n", encoding="utf-8")
-print(f"✅ TONG SO KENH DA LOC: {total_channels}")
-PY "$M3U_FILE"
-          else
-            echo "⚠️ Bo qua buoc loc vi khong co file M3U."
+            echo "Khong tim thay file M3U"
           fi
 
       - name: Commit and push if changed
