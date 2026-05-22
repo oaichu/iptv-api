@@ -37,25 +37,17 @@ jobs:
       - name: Install dependencies
         run: pipenv --python 3.13 && pipenv install --deploy
 
-      - name: Debug - Show config
-        run: |
-          echo "========== user_config.ini =========="
-          cat config/user_config.ini || echo "FILE NOT FOUND"
-          echo ""
-          echo "========== user_demo.txt =========="
-          echo "Số nhóm: $(grep -c '#genre#' config/user_demo.txt || echo 0)"
-          echo "Tổng số kênh trong demo: $(grep -v '^[[:space:]]*$' config/user_demo.txt | grep -v '#genre#' | wc -l || echo 0)"
-
       - name: Update IPTV playlist
         run: pipenv run dev
 
-      - name: Post-process M3U (Khớp tên thông minh cho kênh VN + Ép nhóm + Loại trùng)
+      - name: Post-process M3U (Thuật toán khớp thông minh Tối Ưu Hóa)
         run: |
           if [ ! -f output/user_result.m3u ]; then
             echo "LỖI: Không tìm thấy output/user_result.m3u"
             exit 1
           fi
 
+          # Dọn dẹp sơ bộ
           sed -i 's/\$订阅源//g' output/user_result.m3u
           sed -i 's/未匹配频道/Kênh Chưa Phân Loại/g' output/user_result.m3u
           sed -i 's/无结果频道/Kênh Lỗi - Không Chạy/g' output/user_result.m3u
@@ -66,9 +58,18 @@ jobs:
           import re
           from collections import Counter
 
-          # === ĐỌC user_demo.txt → TẠO BẢN ĐỒ NHÓM ===
+          # --- HÀM CHUẨN HÓA THÔNG MINH ---
+          def clean_name(text):
+              t = text.lower()
+              t = re.sub(r'[\(\[].*?[\)\]]', '', t)  # Bỏ cụm trong ngoặc (1080p), [Geo-blocked]
+              t = re.sub(r'(?i)\b(fhd|hd|sd|4k|1080p|720p|2k)\b', '', t) # Bỏ chữ phân giải
+              t = re.sub(r'[^a-z0-9\+\-\s]', '', t) # GIỮ LẠI dấu + (K+) và dấu - (CCTV-1)
+              t = re.sub(r'\s+', ' ', t).strip()
+              return t
+
+          # --- 1. TẠO BẢN ĐỒ NHÓM TỪ FILE DEMO ---
           group_map = {}
-          current_group = "Kênh Khác"
+          current_group = "Kênh Khác - Tổng Hợp"
           demo_path = Path("config/user_demo.txt")
           if demo_path.exists():
               with open(demo_path, "r", encoding="utf-8", errors="ignore") as f:
@@ -76,72 +77,99 @@ jobs:
                       line = line.strip()
                       if line.endswith("#genre#"):
                           current_group = line.replace(",#genre#", "").strip()
-                      elif line and not line.startswith("[") and not line.endswith("#genre#"):
-                          norm = re.sub(r'\s+', ' ', line.lower().strip())
-                          group_map[norm] = current_group
+                      elif line and not line.startswith("["):
+                          norm = clean_name(line)
+                          if norm and norm not in group_map:
+                              group_map[norm] = current_group
 
-          print(f"Số kênh được phép (demo): {len(group_map)}")
+          # QUAN TRỌNG: Sắp xếp từ khóa theo độ dài GIẢM DẦN. 
+          # -> "vtv5 tây nam bộ" dài hơn "vtv5" nên sẽ được kiểm tra và gom đúng nhóm trước!
+          sorted_keywords = sorted(group_map.keys(), key=len, reverse=True)
 
-          # === XỬ LÝ M3U ===
+          # --- 2. XỬ LÝ FILE M3U ĐẦU RA ---
           path = Path("output/user_result.m3u")
           text = path.read_text(encoding="utf-8", errors="ignore")
           lines = text.splitlines()
 
-          seen = set()
           output = []
-          i = 0
-          while i < len(lines):
-              line = lines[i]
+          seen_urls = set() # Chỉ xóa trùng link hỏng, TUYỆT ĐỐI GIỮ LẠI link dự phòng cho kênh
+
+          if lines and lines[0].startswith("#EXTM3U"):
+              first_line = re.sub(r'tvg-name="[^"]*"', '', lines[0])
+              first_line = re.sub(r'group-title="[^"]*"', '', first_line)
+              output.append(first_line.split(",")[0].strip())
+              start_idx = 1
+          else:
+              start_idx = 0
+
+          current_extinf = None
+          for i in range(start_idx, len(lines)):
+              line = lines[i].strip()
+              if not line: continue
+              
               if line.startswith("#EXTINF"):
-                  match = re.search(r',\s*(.+)$', line)
-                  raw_name = match.group(1).strip().lower() if match else ""
-
-                  # Chuẩn hóa mạnh hơn (dành cho kênh VN)
-                  norm_name = re.sub(r'\s*hd\s*', '', raw_name)
-                  norm_name = re.sub(r'\s+', ' ', norm_name).strip()
-                  norm_name = re.sub(r'[^\w\s]', '', norm_name)  # bỏ dấu câu
-
-                  matched_group = None
-                  for demo_name, grp in group_map.items():
-                      # Khớp mềm mại: chứa nhau hoặc từ đầu khớp
-                      if demo_name in norm_name or norm_name in demo_name or norm_name.startswith(demo_name[:4]):
-                          matched_group = grp
-                          break
-
-                  if matched_group:
-                      key = norm_name
-                      if i + 1 < len(lines) and not lines[i + 1].startswith("#"):
-                          url_line = lines[i + 1]
-                          if key not in seen:
-                              seen.add(key)
-                              # Ép group-title đúng
-                              if 'group-title="' in line:
-                                  line = re.sub(r'group-title="[^"]*"', f'group-title="{matched_group}"', line)
-                              else:
-                                  line = line.replace("#EXTINF:-1", f'#EXTINF:-1 group-title="{matched_group}"', 1)
-                              output.append(line)
-                              output.append(url_line)
-                      i += 2
-                      continue
-              i += 1
+                  current_extinf = line
+              else:
+                  if current_extinf:
+                      url = line
+                      # Xóa link trùng lặp y hệt nhau để app đỡ nặng
+                      if url in seen_urls:
+                          current_extinf = None
+                          continue
+                      
+                      parts = current_extinf.split(",")
+                      raw_channel_name = parts[-1].strip() if len(parts) > 1 else ""
+                      
+                      # Fix lỗi hiển thị ngày giờ thành tên kênh
+                      if re.match(r'^\d{4}-\d{2}-\d{2}', raw_channel_name) or "更新时间" in current_extinf or "Thời Gian" in current_extinf:
+                          match_id = re.search(r'tvg-id="([^"]*)"', current_extinf)
+                          raw_channel_name = match_id.group(1) if match_id else "Unknown"
+                      
+                      # Cạo sạch chữ Trung Quốc (Việt hóa giao diện)
+                      display_name = re.sub(r'[\u4e00-\u9fff]', '', raw_channel_name)
+                      display_name = re.sub(r'\(\s*\)', '', display_name)
+                      display_name = re.sub(r'^[-_|\s]+|[-_|\s]+$', '', display_name).strip()
+                      if not display_name:
+                          display_name = raw_channel_name
+                          
+                      norm_m3u = clean_name(display_name)
+                      
+                      # TIẾN HÀNH KHỚP NHÓM TỪ BẢN ĐỒ
+                      matched_group = "Kênh Chưa Phân Loại"
+                      for kw in sorted_keywords:
+                          # Khớp tuyệt đối, hoặc khớp có cụm từ đứng đầu (VTV1 HD -> khớp VTV1)
+                          if norm_m3u == kw or norm_m3u.startswith(kw + " ") or norm_m3u.startswith(kw + "-"):
+                              matched_group = group_map[kw]
+                              break
+                      
+                      seen_urls.add(url)
+                      
+                      base_info = parts[0]
+                      if 'group-title="' in base_info:
+                          base_info = re.sub(r'group-title="[^"]*"', f'group-title="{matched_group}"', base_info)
+                      else:
+                          base_info = base_info.replace("#EXTINF:-1", f'#EXTINF:-1 group-title="{matched_group}"', 1)
+                      
+                      output.append(f"{base_info},{display_name}")
+                      output.append(url)
+                      current_extinf = None
 
           path.write_text("\n".join(output) + "\n", encoding="utf-8")
 
-          total = len(output) // 2
           print(f"\n{'='*60}")
-          print(f"✅ TỔNG SỐ KÊNH SAU KHI ÉP NHÓM & KHỚP MỀM: {total}")
+          print(f"✅ TỔNG SỐ LUỒNG PHÁT (Đã bao gồm link dự phòng): {len(seen_urls)}")
           print(f"{'='*60}")
-
+          
           groups_list = []
           for l in output:
               if l.startswith("#EXTINF"):
                   m = re.search(r'group-title="([^"]*)"', l)
-                  if m:
-                      groups_list.append(m.group(1))
-          print(f"\nPHÂN BỔ THEO NHÓM:")
+                  if m: groups_list.append(m.group(1))
+                  
+          print(f"\nPHÂN BỔ CHI TIẾT TỪNG NHÓM:")
           for g, c in sorted(Counter(groups_list).items()):
               print(f"  {c:>4}  {g}")
-          print(f"\n{'='*60}")
+          print(f"{'='*60}\n")
           PY
 
       - name: Commit and push if changed
@@ -150,7 +178,6 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git add .
           if ! git diff --staged --quiet; then
-            git commit -m "Auto Updated IPTV - Khớp tên thông minh hơn cho kênh VN"
+            git commit -m "Fixed exact keyword matching and restored backup links"
             git push --force
           fi
-          
