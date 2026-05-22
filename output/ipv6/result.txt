@@ -1,5 +1,5 @@
 🕘️更新时间,#genre#
-2026-05-23 00:15:58,https://jmp2.uk/plu-60d3583ef310610007fb02b1.m3u8
+2026-05-23 00:30:38,https://jmp2.uk/plu-60d3583ef310610007fb02b1.m3u8
 
 VTV - Kênh Quốc Gia,#genre#
 
@@ -32,6 +32,8 @@ Thể Thao Việt Nam,#genre#
 Thể Thao Quốc Tế,#genre#
 
 Phim Truyện,#genre#
+Pluto TV Movies,https://jmp2.uk/plu-5c5c3b948002db3c3e0b262e.m3u8
+Pluto TV Movies,https://jmp2.uk/plu-5ad8d3a31b95267e225e4e09.m3u8
 
 Thiếu Nhi,#genre#
 
@@ -45,7 +47,11 @@ CCTV-11,https://xykt-fix.github.io/play/a02b/index.m3u8
 CCTV-13,https://cdn3.163189.xyz/163189/cctv13
 CCTV-15,https://xykt-fix.github.io/play/a02e/index.m3u8
 
-Kênh Quốc Tế Khác,#genre#
+Kênh Hàn Quốc,#genre#
+
+Kênh Nhật Bản,#genre#
+
+Kênh Khác - Tổng Hợp,#genre#
 
 ♻️未匹配频道,#genre#
 UFC,https://jmp2.uk/plu-6792044b680721c77c5b9ba2.m3u8
@@ -1501,8 +1507,6 @@ Pluto TV Misterios,https://jmp2.uk/plu-5dcde2f53449c50009b2b4dc.m3u8
 Pluto TV Mistérios,https://jmp2.uk/plu-5fac52f142044f00078e2a51.m3u8
 Pluto TV Motor,https://jmp2.uk/plu-6080345ebb49b90007ce0baf.m3u8
 Pluto TV Motor+,https://jmp2.uk/stvp-GBAI5000001A?.m3u8
-Pluto TV Movies,https://jmp2.uk/plu-5c5c3b948002db3c3e0b262e.m3u8
-Pluto TV Movies,https://jmp2.uk/plu-5ad8d3a31b95267e225e4e09.m3u8
 Pluto TV Mystery,https://jmp2.uk/plu-617aad99b68ef100072608cd.m3u8
 Pluto TV Natura,https://jmp2.uk/plu-60802b37709d6b0007b0c549.m3u8
 Pluto TV Naturaleza,https://jmp2.uk/plu-5dd85eac039bba0009e86d1d.m3u8
