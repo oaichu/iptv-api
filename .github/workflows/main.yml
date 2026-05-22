@@ -40,67 +40,65 @@ jobs:
       - name: Update IPTV playlist
         run: pipenv run dev
 
-      - name: Post-process M3U (Thuật toán khớp thông minh Tối Ưu Hóa)
+      - name: Post-process M3U (Bộ Lọc Tuyệt Đối: Giữ đúng nhóm, đúng thứ tự, xóa kênh thừa)
         run: |
           if [ ! -f output/user_result.m3u ]; then
             echo "LỖI: Không tìm thấy output/user_result.m3u"
             exit 1
           fi
 
-          # Dọn dẹp sơ bộ
-          sed -i 's/\$订阅源//g' output/user_result.m3u
-          sed -i 's/未匹配频道/Kênh Chưa Phân Loại/g' output/user_result.m3u
-          sed -i 's/无结果频道/Kênh Lỗi - Không Chạy/g' output/user_result.m3u
-          sed -i 's/更新时间/Thời Gian Cập Nhật/g' output/user_result.m3u
-
           python3 <<'PY'
           from pathlib import Path
           import re
-          from collections import Counter
+          from collections import OrderedDict
 
-          # --- HÀM CHUẨN HÓA THÔNG MINH ---
           def clean_name(text):
+              # Làm sạch tên thông minh để so khớp (bỏ chữ HD, 4K, giữ lại +, -)
               t = text.lower()
-              t = re.sub(r'[\(\[].*?[\)\]]', '', t)  # Bỏ cụm trong ngoặc (1080p), [Geo-blocked]
-              t = re.sub(r'(?i)\b(fhd|hd|sd|4k|1080p|720p|2k)\b', '', t) # Bỏ chữ phân giải
-              t = re.sub(r'[^a-z0-9\+\-\s]', '', t) # GIỮ LẠI dấu + (K+) và dấu - (CCTV-1)
+              t = re.sub(r'[\(\[].*?[\)\]]', '', t)
+              t = re.sub(r'(?i)\b(fhd|hd|sd|4k|1080p|720p|2k)\b', '', t)
+              t = re.sub(r'[^a-z0-9\+\-\s]', '', t)
               t = re.sub(r'\s+', ' ', t).strip()
               return t
 
-          # --- 1. TẠO BẢN ĐỒ NHÓM TỪ FILE DEMO ---
+          # =====================================================================
+          # 1. ĐỌC FILE DEMO ĐỂ LẤY THỨ TỰ NHÓM (ORDERED GROUPS) VÀ DANH SÁCH KÊNH
+          # =====================================================================
+          ordered_groups = []
           group_map = {}
-          current_group = "Kênh Khác - Tổng Hợp"
           demo_path = Path("config/user_demo.txt")
+
           if demo_path.exists():
               with open(demo_path, "r", encoding="utf-8", errors="ignore") as f:
+                  current_group = "Kênh Khác"
                   for line in f:
                       line = line.strip()
+                      if not line: continue
                       if line.endswith("#genre#"):
                           current_group = line.replace(",#genre#", "").strip()
-                      elif line and not line.startswith("["):
+                          if current_group not in ordered_groups:
+                              ordered_groups.append(current_group)
+                      else:
                           norm = clean_name(line)
                           if norm and norm not in group_map:
                               group_map[norm] = current_group
 
-          # QUAN TRỌNG: Sắp xếp từ khóa theo độ dài GIẢM DẦN. 
-          # -> "vtv5 tây nam bộ" dài hơn "vtv5" nên sẽ được kiểm tra và gom đúng nhóm trước!
+          # Sắp xếp từ khóa Demo dài check trước, ngắn check sau (VD: VTV5 Tây Nam Bộ check trước VTV5)
           sorted_keywords = sorted(group_map.keys(), key=len, reverse=True)
 
-          # --- 2. XỬ LÝ FILE M3U ĐẦU RA ---
+          # =====================================================================
+          # 2. XỬ LÝ FILE RAW M3U TỪ TOOL TRUNG QUỐC
+          # =====================================================================
           path = Path("output/user_result.m3u")
           text = path.read_text(encoding="utf-8", errors="ignore")
+          text = text.replace("$订阅源", "") # Xóa chữ Tàu mặc định
           lines = text.splitlines()
 
-          output = []
-          seen_urls = set() # Chỉ xóa trùng link hỏng, TUYỆT ĐỐI GIỮ LẠI link dự phòng cho kênh
+          # Tạo từ điển chứa kết quả xuất ra theo đúng thứ tự mảng ordered_groups
+          grouped_output = {grp: [] for grp in ordered_groups}
+          seen_urls = set()
 
-          if lines and lines[0].startswith("#EXTM3U"):
-              first_line = re.sub(r'tvg-name="[^"]*"', '', lines[0])
-              first_line = re.sub(r'group-title="[^"]*"', '', first_line)
-              output.append(first_line.split(",")[0].strip())
-              start_idx = 1
-          else:
-              start_idx = 0
+          start_idx = 1 if (lines and lines[0].startswith("#EXTM3U")) else 0
 
           current_extinf = None
           for i in range(start_idx, len(lines)):
@@ -112,7 +110,12 @@ jobs:
               else:
                   if current_extinf:
                       url = line
-                      # Xóa link trùng lặp y hệt nhau để app đỡ nặng
+                      # Bỏ qua dòng chữ thông báo cập nhật của TQ
+                      if "更新时间" in current_extinf or "Thời Gian Cập Nhật" in current_extinf:
+                          current_extinf = None
+                          continue
+
+                      # Tránh trùng lặp link y hệt nhau
                       if url in seen_urls:
                           current_extinf = None
                           continue
@@ -120,55 +123,64 @@ jobs:
                       parts = current_extinf.split(",")
                       raw_channel_name = parts[-1].strip() if len(parts) > 1 else ""
                       
-                      # Fix lỗi hiển thị ngày giờ thành tên kênh
-                      if re.match(r'^\d{4}-\d{2}-\d{2}', raw_channel_name) or "更新时间" in current_extinf or "Thời Gian" in current_extinf:
+                      # Fix lỗi hiển thị dải ngày giờ
+                      if re.match(r'^\d{4}-\d{2}-\d{2}', raw_channel_name):
                           match_id = re.search(r'tvg-id="([^"]*)"', current_extinf)
-                          raw_channel_name = match_id.group(1) if match_id else "Unknown"
+                          raw_channel_name = match_id.group(1) if match_id else raw_channel_name
                       
-                      # Cạo sạch chữ Trung Quốc (Việt hóa giao diện)
+                      # Cạo sạch chữ Trung Quốc ở tên hiển thị
                       display_name = re.sub(r'[\u4e00-\u9fff]', '', raw_channel_name)
                       display_name = re.sub(r'\(\s*\)', '', display_name)
                       display_name = re.sub(r'^[-_|\s]+|[-_|\s]+$', '', display_name).strip()
-                      if not display_name:
-                          display_name = raw_channel_name
+                      if not display_name: display_name = raw_channel_name
                           
                       norm_m3u = clean_name(display_name)
                       
-                      # TIẾN HÀNH KHỚP NHÓM TỪ BẢN ĐỒ
-                      matched_group = "Kênh Chưa Phân Loại"
+                      # TIẾN HÀNH KHỚP KÊNH THEO DEMO (LOGIC CHẶT CHẼ)
+                      matched_group = None
                       for kw in sorted_keywords:
-                          # Khớp tuyệt đối, hoặc khớp có cụm từ đứng đầu (VTV1 HD -> khớp VTV1)
-                          if norm_m3u == kw or norm_m3u.startswith(kw + " ") or norm_m3u.startswith(kw + "-"):
+                          # Khớp nếu trùng hoàn toàn, hoặc bắt đầu bằng cụm đó, hoặc nằm trọn vẹn dưới dạng 1 từ
+                          if norm_m3u == kw or norm_m3u.startswith(kw + " ") or norm_m3u.startswith(kw + "-") or f" {kw} " in f" {norm_m3u} ":
                               matched_group = group_map[kw]
                               break
                       
-                      seen_urls.add(url)
+                      # 🔴 LOGIC THANH TRỪNG: Nếu kênh KHÔNG thuôc nhóm nào trong Demo => BỎ QUA LUÔN (KHÔNG LƯU)
+                      if matched_group:
+                          seen_urls.add(url)
+                          base_info = parts[0]
+                          # Ép lại Group-Title cho chuẩn
+                          if 'group-title="' in base_info:
+                              base_info = re.sub(r'group-title="[^"]*"', f'group-title="{matched_group}"', base_info)
+                          else:
+                              base_info = base_info.replace("#EXTINF:-1", f'#EXTINF:-1 group-title="{matched_group}"', 1)
+                          
+                          # Đưa kênh vào đúng rổ nhóm của nó trong Memory
+                          grouped_output[matched_group].append((f"{base_info},{display_name}", url))
                       
-                      base_info = parts[0]
-                      if 'group-title="' in base_info:
-                          base_info = re.sub(r'group-title="[^"]*"', f'group-title="{matched_group}"', base_info)
-                      else:
-                          base_info = base_info.replace("#EXTINF:-1", f'#EXTINF:-1 group-title="{matched_group}"', 1)
-                      
-                      output.append(f"{base_info},{display_name}")
-                      output.append(url)
                       current_extinf = None
 
-          path.write_text("\n".join(output) + "\n", encoding="utf-8")
+          # =====================================================================
+          # 3. GHI FILE M3U THEO ĐÚNG THỨ TỰ NHÓM CỦA DEMO
+          # =====================================================================
+          output_lines = ['#EXTM3U']
+          total_channels = 0
+
+          # Duyệt qua mảng ordered_groups để đảm bảo VTV xuất hiện trước, HTV thứ 2, ...
+          for grp in ordered_groups:
+              for extinf, url in grouped_output[grp]:
+                  output_lines.append(extinf)
+                  output_lines.append(url)
+                  total_channels += 1
+
+          path.write_text("\n".join(output_lines) + "\n", encoding="utf-8")
 
           print(f"\n{'='*60}")
-          print(f"✅ TỔNG SỐ LUỒNG PHÁT (Đã bao gồm link dự phòng): {len(seen_urls)}")
+          print(f"✅ TỔNG SỐ KÊNH SỐNG THU ĐƯỢC: {total_channels}")
           print(f"{'='*60}")
-          
-          groups_list = []
-          for l in output:
-              if l.startswith("#EXTINF"):
-                  m = re.search(r'group-title="([^"]*)"', l)
-                  if m: groups_list.append(m.group(1))
-                  
-          print(f"\nPHÂN BỔ CHI TIẾT TỪNG NHÓM:")
-          for g, c in sorted(Counter(groups_list).items()):
-              print(f"  {c:>4}  {g}")
+          print("THỨ TỰ HIỂN THỊ CÁC NHÓM TRÊN APP (Chuẩn 100% theo Demo):")
+          for idx, grp in enumerate(ordered_groups, 1):
+              count = len(grouped_output[grp])
+              print(f"  {idx:02d}. [{count:>4} kênh] - {grp}")
           print(f"{'='*60}\n")
           PY
 
@@ -178,6 +190,6 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git add .
           if ! git diff --staged --quiet; then
-            git commit -m "Fixed exact keyword matching and restored backup links"
+            git commit -m "STRICT LOGIC: Enforce Demo order, delete unlisted channels, optimize matching"
             git push --force
           fi
