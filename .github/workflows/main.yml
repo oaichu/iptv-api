@@ -1,45 +1,3 @@
-name: 'Update schedule'
-
-on:
-  workflow_dispatch:
-
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
-jobs:
-  push:
-    runs-on: ubuntu-latest
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
-    steps:
-      - name: Set branch name
-        run: echo "BRANCH_NAME=${{ github.repository_owner == 'Guovin' && 'gd' || 'master' }}" >> $GITHUB_ENV
-
-      - name: Checkout repository
-        uses: actions/checkout@v5
-        with:
-          ref: ${{ env.BRANCH_NAME }}
-
-      - name: Set up Python 3.13
-        uses: actions/setup-python@v6
-        with:
-          python-version: '3.13'
-          update-environment: true
-          cache: 'pipenv'
-
-      - name: Install FFmpeg
-        run: sudo apt-get update && sudo apt-get install -y ffmpeg
-
-      - name: Install pipenv
-        run: pip3 install --user pipenv
-
-      - name: Install dependencies
-        run: pipenv --python 3.13 && pipenv install --deploy
-
-      - name: Update IPTV playlist
-        run: pipenv run dev
-
       - name: Post-process M3U Filter
         run: |
           if [ ! -f output/user_result.m3u ]; then
@@ -53,31 +11,32 @@ jobs:
 
           # ========== 1. Làm sạch tên nhưng GIỮ dấu tiếng Việt ==========
           def clean_name(text: str) -> str:
+              if not text: return ""
               t = text.lower().strip()
               # Xoá nội dung trong ngoặc (...) [...]
               t = re.sub(r'[\(\[].*?[\)\]]', '', t)
-              # Xoá từ khoá độ phân giải (có thể tuỳ chỉnh)
-              t = re.sub(r'\b(fhd|hd|sd|4k|1080p|720p|2k)\b', '', t, flags=re.IGNORECASE)
+              # Xoá từ khoá độ phân giải & hậu tố không cần thiết
+              t = re.sub(r'\b(fhd|hd|sd|4k|8k|1080p|720p|2k|uhd|hdr|hevc|h264|h265|live|backup|dự phòng)\b', '', t, flags=re.IGNORECASE)
               # Giữ chữ cái Unicode, số, khoảng trắng, dấu +, -
               t = re.sub(r'[^\w\s\+\-]', '', t, flags=re.UNICODE)
-              # Xoá dấu +, - thừa ở đầu/cuối (nếu muốn)
+              # Xoá khoảng trắng giữa chữ và số (VTV 1 -> VTV1, K+ 1 -> K+1)
+              t = re.sub(r'([a-z])\s+(\d)', r'\1\2', t)
+              t = re.sub(r'(\d)\s+([a-z])', r'\1\2', t)
               t = t.strip('+- ')
-              # Gộp nhiều khoảng trắng
               t = re.sub(r'\s+', ' ', t)
               return t.strip()
 
-          # ========== 2. Đọc file demo lấy danh sách nhóm + kênh theo đúng thứ tự ==========
+          # ========== 2. Đọc file demo ==========
           demo_path = Path("config/user_demo.txt")
-          groups_order = []                     # thứ tự các nhóm
-          channels_in_group = {}                # nhóm -> [tên gốc, tên gốc, ...]
+          groups_order = []
+          channels_in_group = {}
           current_group = None
 
           if demo_path.exists():
               with open(demo_path, "r", encoding="utf-8", errors="ignore") as f:
                   for line in f:
                       line = line.strip()
-                      if not line:
-                          continue
+                      if not line: continue
                       if line.endswith("#genre#"):
                           current_group = line.replace(",#genre#", "").strip()
                           if current_group not in groups_order:
@@ -90,36 +49,34 @@ jobs:
               print("CẢNH BÁO: Không tìm thấy config/user_demo.txt")
               exit(1)
 
-          # Tạo ánh xạ: tên sạch -> (nhóm, vị trí trong demo)
-          position_map = {}   # clean_name -> (group, idx_in_group)
+          # Ánh xạ: tên đã làm sạch -> (nhóm, vị trí trong nhóm, tên gốc trong demo)
+          position_map = {}
           for grp in groups_order:
               for idx, ch_name in enumerate(channels_in_group[grp]):
                   clean = clean_name(ch_name)
-                  if clean not in position_map:
-                      position_map[clean] = (grp, idx)
+                  if clean and clean not in position_map:
+                      position_map[clean] = (grp, idx, ch_name)
 
-          # ========== 3. Đọc M3U và nhóm kênh theo demo ==========
-          path = Path("output/user_result.m3u")
-          text = path.read_text(encoding="utf-8", errors="ignore")
-          text = text.replace("$订阅源", "")
+          # ========== 3. Đọc và xử lý M3U ==========
+          m3u_path = Path("output/user_result.m3u")
+          text = m3u_path.read_text(encoding="utf-8", errors="ignore").replace("$订阅源", "")
           lines = text.splitlines()
 
           grouped = {grp: [] for grp in groups_order}
-          unmatched = []   # kênh không khớp demo
-
+          unmatched = []
           seen_urls = set()
+          seen_channels = set() # Chống trùng lặp kênh (chỉ lấy 1 link/kênh)
           start_idx = 1 if (lines and lines[0].startswith("#EXTM3U")) else 0
 
           current_extinf = None
           for i in range(start_idx, len(lines)):
               line = lines[i].strip()
-              if not line:
-                  continue
+              if not line: continue
+              
               if line.startswith("#EXTINF"):
                   current_extinf = line
               else:
-                  if not current_extinf:
-                      continue
+                  if not current_extinf: continue
                   url = line
 
                   if "更新时间" in current_extinf or "Thời Gian Cập Nhật" in current_extinf:
@@ -140,28 +97,53 @@ jobs:
                   display_name = re.sub(r'[\u4e00-\u9fff]', '', raw_channel_name)
                   display_name = re.sub(r'\(\s*\)', '', display_name)
                   display_name = re.sub(r'^[-_|\s]+|[-_|\s]+$', '', display_name).strip()
-                  if not display_name:
-                      display_name = raw_channel_name
+                  if not display_name: display_name = raw_channel_name
 
                   clean_display = clean_name(display_name)
 
+                  # === LOGIC KHỚP TÊN THÔNG MINH ===
+                  matched_grp = None
+                  matched_idx = None
+                  matched_demo_name = None
+
+                  # Ưu tiên 1: Khớp chính xác 100%
                   if clean_display in position_map:
-                      grp, demo_idx = position_map[clean_display]
+                      matched_grp, matched_idx, matched_demo_name = position_map[clean_display]
+                  else:
+                      # Ưu tiên 2: Khớp tương đối (An toàn, không bị nhầm VTV1 với VTV10)
+                      for demo_clean in sorted(position_map.keys(), key=len, reverse=True):
+                          if len(demo_clean) >= 3:
+                              if clean_display == demo_clean or \
+                                 clean_display.startswith(demo_clean + " ") or \
+                                 clean_display.endswith(" " + demo_clean) or \
+                                 (" " + demo_clean + " ") in (" " + clean_display + " "):
+                                  matched_grp, matched_idx, matched_demo_name = position_map[demo_clean]
+                                  break
+
+                  # === XỬ LÝ KẾT QUẢ KHỚP ===
+                  if matched_grp is not None:
+                      # Nếu kênh này đã được thêm rồi (có nhiều link) -> Bỏ qua các link sau
+                      if matched_demo_name in seen_channels:
+                          current_extinf = None
+                          continue
+                      
+                      seen_channels.add(matched_demo_name)
                       seen_urls.add(url)
 
                       base_info = parts[0]
                       if 'group-title="' in base_info:
-                          base_info = re.sub(r'group-title="[^"]*"', f'group-title="{grp}"', base_info)
+                          base_info = re.sub(r'group-title="[^"]*"', f'group-title="{matched_grp}"', base_info)
                       else:
-                          base_info = base_info.replace("#EXTINF:-1", f'#EXTINF:-1 group-title="{grp}"', 1)
+                          base_info = base_info.replace("#EXTINF:-1", f'#EXTINF:-1 group-title="{matched_grp}"', 1)
 
-                      grouped[grp].append( (demo_idx, f"{base_info},{display_name}", url) )
+                      # Dùng tên gốc từ file Demo để hiển thị cho đẹp và chuẩn
+                      grouped[matched_grp].append((matched_idx, f"{base_info},{matched_demo_name}", url))
                   else:
-                      unmatched.append( (current_extinf, url) )
+                      unmatched.append((current_extinf, url))
 
                   current_extinf = None
 
-          # ========== 4. Xuất kết quả đúng thứ tự demo ==========
+          # ========== 4. Xuất kết quả theo đúng thứ tự demo ==========
           output_lines = ['#EXTM3U']
           total_channels = 0
 
@@ -174,33 +156,27 @@ jobs:
 
           if unmatched:
               output_lines.append('')
+              seen_unmatched = set()
               for extinf, url in unmatched:
+                  if url in seen_unmatched: continue
+                  seen_unmatched.add(url)
                   if 'group-title="' not in extinf:
                       extinf = extinf.replace("#EXTINF:-1", '#EXTINF:-1 group-title="Kênh Khác"')
                   output_lines.append(extinf)
                   output_lines.append(url)
                   total_channels += 1
 
-          path.write_text("\n".join(output_lines) + "\n", encoding="utf-8")
+          m3u_path.write_text("\n".join(output_lines) + "\n", encoding="utf-8")
 
-          print(f"\n{'='*60}")
+          # ========== 5. In báo cáo ==========
+          print(f"\n{'='*70}")
           print(f"✅ TỔNG SỐ KÊNH SÓNG THU ĐƯỢC: {total_channels}")
-          print(f"{'='*60}")
-          print("THỨ TỰ HIỂN THỊ CÁC NHÓM (theo demo):")
+          print(f"{'='*70}")
+          print("THỨ TỰ HIỂN THỊ CÁC NHÓM (Chuẩn 100% theo file demo):")
           for idx, grp in enumerate(groups_order, 1):
               count = len(grouped[grp])
               print(f"  {idx:02d}. [{count:>4} kênh] - {grp}")
           if unmatched:
               print(f"  --. [{len(unmatched):>4} kênh] - Kênh Khác (không có trong demo)")
-          print(f"{'='*60}\n")
+          print(f"{'='*70}\n")
           PY
-
-      - name: Commit and push if changed
-        run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git add .
-          if ! git diff --staged --quiet; then
-            git commit -m "Fixed YAML Syntax Error and enforced demo logic"
-            git push --force
-          fi
