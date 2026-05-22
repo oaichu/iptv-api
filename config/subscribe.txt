@@ -1,15 +1,15 @@
 https://iptv-org.github.io/iptv/index.m3u
 https://iptv-org.github.io/iptv/languages/vie.m3u
+https://iptv-org.github.io/iptv/languages/zho.m3u
 https://iptv-org.github.io/iptv/categories/sports.m3u
 https://iptv-org.github.io/iptv/categories/news.m3u
 https://iptv-org.github.io/iptv/categories/movies.m3u
 https://iptv-org.github.io/iptv/categories/entertainment.m3u
 https://iptv-org.github.io/iptv/categories/kids.m3u
+https://iptv-org.github.io/iptv/categories/documentary.m3u
+https://iptv-org.github.io/iptv/categories/music.m3u
+https://raw.githubusercontent.com/Free-TV/IPTV/master/playlist.m3u
 https://raw.githubusercontent.com/iptv-org/iptv/master/streams/vn.m3u
+https://raw.githubusercontent.com/iptv-org/iptv/master/streams/cn.m3u
 https://raw.githubusercontent.com/iptv-org/iptv/master/streams/us.m3u
 https://raw.githubusercontent.com/iptv-org/iptv/master/streams/uk.m3u
-https://raw.githubusercontent.com/iptv-org/iptv/master/streams/cn.m3u
-https://raw.githubusercontent.com/iptv-org/iptv/master/streams/kr.m3u
-https://raw.githubusercontent.com/iptv-org/iptv/master/streams/jp.m3u
-
-# https://raw.githubusercontent.com/Free-TV/IPTV/master/playlist.m3u
