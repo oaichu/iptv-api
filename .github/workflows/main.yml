@@ -39,15 +39,8 @@ jobs:
         run: pipenv --python 3.13 && pipenv install --deploy
       - name: Update
         run: pipenv run dev
-        - name: Update
-        run: pipenv run dev
-
-      # ---> DÁN DÒNG LỆNH MỚI NÀY CỦA TÔI VÀO ĐÂY <---
       - name: Clean Suffix for IPTV Smarters
         run: sed -i 's/\$订阅源//g' output/user_result.m3u
-
-      - name: Commit and push all changes
-        run: |
       - name: Commit and push if changed
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
