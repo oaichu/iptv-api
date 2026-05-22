@@ -36,7 +36,7 @@ jobs:
       - name: Update IPTV playlist
         run: pipenv run dev
 
-      - name: Create Ultimate Filter Script
+      - name: Create Ultimate Anti-Duplicate Script
         run: |
           cat << 'PYEOF' > filter.py
           import re
@@ -54,11 +54,9 @@ jobs:
               if not text: return ""
               t = text.lower().strip()
               t = re.sub(r'[\(\[【].*?[\)\]】]', '', t)
-              # Rửa sạch mọi hậu tố chất lượng và từ khóa thừa
               t = re.sub(r'(?i)\b(fhd|hd|sd|4k|8k|1080p|720p|2k|uhd|hdr|hevc|h264|h265|live|backup|du phong|dự phòng|test|ipv6|ipv4|vietnam|vn)\b', '', t)
               t = remove_chinese(t)
               t = re.sub(r'[^\w\s\+\-]', '', t, flags=re.UNICODE)
-              # Xóa khoảng trắng giữa chữ và số (VTV 1 -> VTV1)
               t = re.sub(r'([a-z])\s+(\d)', r'\1\2', t)
               t = re.sub(r'(\d)\s+([a-z])', r'\1\2', t)
               t = re.sub(r'\s+', ' ', t).strip('+- ')
@@ -87,12 +85,11 @@ jobs:
           m3u_path = Path(m3u_file_path)
           lines = m3u_path.read_text(encoding="utf-8", errors="ignore").replace("$订阅源", "").splitlines()
           
-          # Lưu kết quả: {group: [(idx, extinf, url)]}
           grouped = {grp: [] for grp in groups_order}
           unmatched = []
           
-          # CHỐNG LẶP TUYỆT ĐỐI: Mỗi kênh trong Demo chỉ nhận đúng 1 URL đầu tiên
-          added_demo_channels = set() 
+          # 🛑 CHỐNG LẶP TUYỆT ĐỐI THEO TÊN KÊNH (GLOBAL)
+          global_seen_names = set() 
           
           current_extinf = None
           for line in lines[1:] if lines and lines[0].startswith("#EXTM3U") else lines:
@@ -113,11 +110,9 @@ jobs:
                   
                   matched_grp, matched_idx, matched_demo_name = None, None, None
                   
-                  # 1. Ưu tiên khớp chính xác 100%
                   if clean_display in position_map:
                       matched_grp, matched_idx, matched_demo_name = position_map[clean_display]
                   else:
-                      # 2. Khớp biên (Word Boundary) - Chống nhầm VTV1 với VTV10
                       for dc in sorted(position_map.keys(), key=len, reverse=True):
                           if len(dc) >= 2:
                               pattern = r'\b' + re.escape(dc) + r'\b'
@@ -126,9 +121,9 @@ jobs:
                                   break
                   
                   if matched_grp:
-                      # Nếu kênh này chưa được thêm vào -> Thêm vào (Chống lặp)
-                      if matched_demo_name not in added_demo_channels:
-                          added_demo_channels.add(matched_demo_name)
+                      # Kiểm tra xem tên kênh chuẩn này đã được thêm chưa
+                      if matched_demo_name not in global_seen_names:
+                          global_seen_names.add(matched_demo_name)
                           base_info = parts[0]
                           if 'group-title="' in base_info: base_info = re.sub(r'group-title="[^"]*"', f'group-title="{matched_grp}"', base_info)
                           else: base_info = base_info.replace("#EXTINF:-1", f'#EXTINF:-1 group-title="{matched_grp}"', 1)
@@ -139,26 +134,33 @@ jobs:
 
           output_lines, total = ['#EXTM3U'], 0
           
-          # Xuất kênh theo đúng thứ tự Demo
           for grp in groups_order:
               for idx, ext, url in sorted(grouped[grp], key=lambda x: x[0]):
                   output_lines.extend([ext, url])
                   total += 1
 
-          # Xử lý kênh rác (Rửa sạch tiếng Trung, ném vào Kênh Khác)
+          # Xử lý Kênh Khác (Cũng phải kiểm tra Global để chống lặp)
           if unmatched:
-              valid, seen_u = [], set()
+              valid = []
               for ext, url in unmatched:
-                  if url in seen_u: continue
                   parts = ext.split(",")
                   raw = parts[-1].strip() if len(parts) > 1 else ""
                   c_name = remove_chinese(raw).strip()
                   if not c_name or len(c_name) < 2: continue
-                  seen_u.add(url)
+                  
+                  c_name_clean = clean_name(c_name)
+                  # 🛑 Nếu tên kênh này đã tồn tại (dù là ở nhóm trên) -> BỎ QUA
+                  if c_name_clean in global_seen_names or c_name in global_seen_names:
+                      continue
+                      
+                  global_seen_names.add(c_name_clean)
+                  global_seen_names.add(c_name)
+                  
                   base = parts[0]
                   if 'group-title="' not in base: base = base.replace("#EXTINF:-1", '#EXTINF:-1 group-title="Kenh Khac"')
                   else: base = re.sub(r'group-title="[^"]*"', 'group-title="Kenh Khac"', base)
                   valid.append((f"{base},{c_name}", url))
+                  
               if valid:
                   output_lines.append('')
                   for ext, url in valid: output_lines.extend([ext, url]); total += 1
