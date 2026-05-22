@@ -1,5 +1,4 @@
 name: 'Update schedule'
-
 on:
   workflow_dispatch:
   schedule:
@@ -8,7 +7,6 @@ on:
 jobs:
   push:
     runs-on: ubuntu-latest
-
     steps:
       - name: Set branch name
         run: echo "BRANCH_NAME=${{ github.repository_owner == 'Guovin' && 'gd' || 'master' }}" >> $GITHUB_ENV
@@ -43,22 +41,11 @@ jobs:
           from pathlib import Path
           import sys
 
-          # ─────────────────────────────────────────────────────────────────────────
-          # COMPILED PATTERNS
-          # ─────────────────────────────────────────────────────────────────────────
-          _CJK   = re.compile(r'[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff\u3000-\u303f\uff00-\uffef]')
+          _CJK = re.compile(r'[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff\u3000-\u303f\uff00-\uffef]')
           _BRACE = re.compile(r'[(\[【（〔][^\)\]】）〕]*[)\]】）〕]')
-          _NOISE = re.compile(
-              r'(?i)\b(fhd|1080[pi]|720p|2160p|4k|8k|uhd|hevc|h\.?26[45]|avc|aac|'
-              r'geo[\-\s]?blocked|backup|du\s?phong|test|stream|iptv|live)\b'
-          )
+          _NOISE = re.compile(r'(?i)\b(fhd|1080[pi]|720p|2160p|4k|8k|uhd|hevc|h\.?26[45]|geo[\-\s]?blocked|backup|du\s?phong|test|stream|iptv)\b')
           _VN_SUFFIX = re.compile(r'(?i)(^|\s)vn(\s|$)')
-          # Channel-code normalizer: "VTV 1" → "vtv1", "K+ 1" → "k+1"
-          _CODE = re.compile(
-              r'\b(vtv|htv|sctv|vtvcab|cctv|kbs|mbc|sbs|tvn|ocn|nhk|cna|cnbc|on)\s+(\d+)\b|'
-              r'\b(k\+)\s+(\d+)\b',
-              re.IGNORECASE
-          )
+          _CODE = re.compile(r'\b(vtv|htv|sctv|vtvcab|cctv|kbs|mbc|sbs|tvn|ocn|nhk|cna|cnbc|on)\s+(\d+)\b|\b(k\+?)\s*(\d+)\b', re.IGNORECASE)
           _SPC = re.compile(r'\s+')
 
           def _code_collapse(m):
@@ -67,21 +54,7 @@ jobs:
               return m.group(3).lower() + m.group(4)
 
           def norm(text: str, no_hd: bool = False) -> str:
-              """Return a canonical lookup key for a channel name.
-
-              Steps (in order):
-              1. Strip bracket groups: (foo) [foo] 【foo】
-              2. Remove CJK characters
-              3. Unify dashes then convert dash/underscore to space
-              4. Remove generic noise keywords (FHD, backup, live …)
-              5. Optionally remove HD (for fallback matching pass)
-              6. Remove standalone "vn" country suffix
-              7. Strip any remaining non-word chars except +
-              8. Collapse whitespace and lowercase
-              9. Collapse "VTV 1" → "vtv1" etc.
-              """
-              if not text:
-                  return ""
+              if not text: return ""
               t = _BRACE.sub(' ', text)
               t = _CJK.sub(' ', t)
               t = re.sub(r'[–—−]', '-', t)
@@ -95,26 +68,21 @@ jobs:
               t = _CODE.sub(_code_collapse, t)
               return t
 
-          # ─────────────────────────────────────────────────────────────────────────
-          # 1. LOAD DEMO STRUCTURE
-          # ─────────────────────────────────────────────────────────────────────────
-          m3u_path  = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("")
+          m3u_path = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("")
           demo_path = Path("config/user_demo.txt")
 
           if not m3u_path.exists():
-              print("ERROR: M3U file not found:", m3u_path)
-              sys.exit(0)
+              print("ERROR: M3U file not found")
+              sys.exit(1)
 
-          group_order    = []          # preserves demo ordering
-          demo_structure = {}          # group → [ch, …] (preserves per-group ordering)
-
+          group_order = []
+          demo_structure = {}
           if demo_path.exists():
               current_group = None
               with open(demo_path, encoding="utf-8", errors="ignore") as f:
                   for line in f:
                       line = line.strip()
-                      if not line:
-                          continue
+                      if not line: continue
                       if line.endswith("#genre#"):
                           current_group = line.replace(",#genre#", "").strip()
                           if current_group not in group_order:
@@ -122,145 +90,75 @@ jobs:
                               demo_structure[current_group] = []
                       elif current_group and line not in demo_structure[current_group]:
                           demo_structure[current_group].append(line)
-          else:
-              print("ERROR: Demo file not found:", demo_path)
-              sys.exit(1)
 
-          # ─────────────────────────────────────────────────────────────────────────
-          # 2. BUILD LOOKUP TABLES  (O(1) exact-match dict — no prefix false-fires)
-          #
-          #    exact_lut  : normalized key          → (grp, ch)
-          #    nohd_lut   : key-without-HD          → (grp, ch)   [HD demo slots only]
-          #
-          # Matching strategy (three passes in find_slot):
-          #   Pass 1 — exact:         norm(m3u_name)        in exact_lut
-          #   Pass 2 — m3u has HD:    norm(m3u_name,no_hd)  in exact_lut  (maps "VTV1 HD SD-only-source" → "VTV1")
-          #   Pass 3 — demo has HD:   norm(m3u_name)        in nohd_lut   (maps non-HD source → HD demo slot)
-          # ─────────────────────────────────────────────────────────────────────────
-          exact_lut: dict[str, tuple[str, str]] = {}
-          nohd_lut:  dict[str, tuple[str, str]] = {}
-
+          exact_lut = {}
+          nohd_lut = {}
           for grp in group_order:
               for ch in demo_structure[grp]:
                   key = norm(ch)
-                  if key and key not in exact_lut:
+                  if key:
                       exact_lut[key] = (grp, ch)
                   key_nohd = norm(ch, no_hd=True)
-                  if key_nohd and key_nohd != key and key_nohd not in nohd_lut:
+                  if key_nohd and key_nohd != key:
                       nohd_lut[key_nohd] = (grp, ch)
 
           def find_slot(raw_name: str):
-              """Return (grp, ch) for the best-matching demo slot, or None."""
               k = norm(raw_name)
-              if k in exact_lut:
-                  return exact_lut[k]
+              if k in exact_lut: return exact_lut[k]
               k_nohd = norm(raw_name, no_hd=True)
-              if k_nohd != k and k_nohd in exact_lut:
-                  return exact_lut[k_nohd]
-              if k in nohd_lut:
-                  return nohd_lut[k]
+              if k_nohd in exact_lut: return exact_lut[k_nohd]
+              if k_nohd in nohd_lut: return nohd_lut[k_nohd]
               return None
 
-          # ─────────────────────────────────────────────────────────────────────────
-          # 3. PARSE M3U  — first-hit-wins per slot, global URL dedup
-          # ─────────────────────────────────────────────────────────────────────────
-          results:   dict = {grp: {ch: None for ch in demo_structure[grp]} for grp in group_order}
-          seen_urls: set  = set()
-
-          raw_content = m3u_path.read_text(encoding="utf-8", errors="ignore")
-          raw_content = raw_content.replace("$订阅源", "")
-          lines = raw_content.splitlines()
+          results = {grp: {ch: None for ch in demo_structure[grp]} for grp in group_order}
+          seen_urls = set()
+          lines = m3u_path.read_text(encoding="utf-8", errors="ignore").replace("$订阅源", "").splitlines()
 
           current_extinf = None
-          for raw_line in lines:
-              line = raw_line.strip()
-              if not line or line.startswith("#EXTM3U"):
-                  continue
-
+          for line in lines:
+              line = line.strip()
+              if not line or line.startswith("#EXTM3U"): continue
               if line.startswith("#EXTINF"):
                   current_extinf = line
                   continue
-
-              if current_extinf is None:
-                  continue
+              if current_extinf is None: continue
 
               url = line
-
-              # Skip meta/update-time rows
-              if "更新时间" in current_extinf or "Thời Gian" in current_extinf:
+              if url in seen_urls or any(x in current_extinf for x in ["更新时间", "Thời Gian"]):
                   current_extinf = None
                   continue
 
-              # Skip already-used URLs
-              if url in seen_urls:
-                  current_extinf = None
-                  continue
-
-              # --- Extract channel name (split on LAST comma = standard M3U format) ---
               last_comma = current_extinf.rfind(",")
-              if last_comma == -1:
-                  current_extinf = None
-                  continue
-              extinf_head = current_extinf[:last_comma]
-              raw_name    = current_extinf[last_comma + 1:].strip()
-
-              # Fallback: if name looks like a datestamp "2024-01-15 …", prefer tvg-id
+              raw_name = current_extinf[last_comma + 1:].strip() if last_comma != -1 else ""
               if re.match(r'^\d{4}-\d{2}-\d{2}', raw_name):
                   m = re.search(r'tvg-id="([^"]*)"', current_extinf)
-                  if m:
-                      raw_name = m.group(1)
+                  if m: raw_name = m.group(1)
 
               slot = find_slot(raw_name)
               if slot:
                   grp, ch = slot
-                  if results[grp][ch] is None:          # first-hit only
-                      # Rewrite group-title to match demo group
+                  if results[grp][ch] is None:
+                      extinf_head = current_extinf[:last_comma]
                       if 'group-title="' in extinf_head:
-                          extinf_head = re.sub(
-                              r'group-title="[^"]*"',
-                              f'group-title="{grp}"',
-                              extinf_head
-                          )
+                          extinf_head = re.sub(r'group-title="[^"]*"', f'group-title="{grp}"', extinf_head)
                       else:
-                          extinf_head = extinf_head.replace(
-                              "#EXTINF:-1",
-                              f'#EXTINF:-1 group-title="{grp}"',
-                              1
-                          )
-                      # Use canonical demo channel name (not whatever the source says)
+                          extinf_head = extinf_head.replace("#EXTINF:-1", f'#EXTINF:-1 group-title="{grp}"', 1)
                       results[grp][ch] = (f"{extinf_head},{ch}", url)
                       seen_urls.add(url)
-
               current_extinf = None
 
-          # ─────────────────────────────────────────────────────────────────────────
-          # 4. WRITE OUTPUT  — strict demo order, no extras, no gaps
-          # ─────────────────────────────────────────────────────────────────────────
           out_lines = ["#EXTM3U"]
-          total   = 0
-          missing = []
-
+          total = 0
           for grp in group_order:
               for ch in demo_structure[grp]:
-                  entry = results[grp][ch]
-                  if entry:
-                      extinf, url = entry
+                  if results[grp][ch]:
+                      extinf, url = results[grp][ch]
                       out_lines.append(extinf)
                       out_lines.append(url)
                       total += 1
-                  else:
-                      missing.append(f"  [{grp}] {ch}")
 
-          Path("output/user_result.m3u").write_text(
-              "\n".join(out_lines) + "\n", encoding="utf-8"
-          )
-
-          total_demo = sum(len(chs) for chs in demo_structure.values())
-          print(f"✅ KHỚP THÀNH CÔNG : {total}/{total_demo} kênh")
-          if missing:
-              print(f"⚠️  KHÔNG TÌM THẤY : {len(missing)} kênh")
-              for m in missing:
-                  print(m)
+          Path("output/user_result.m3u").write_text("\n".join(out_lines) + "\n", encoding="utf-8")
+          print(f"✅ FILTER DONE: {total} kênh")
           PYEOF
 
       - name: Run Filter
@@ -270,17 +168,59 @@ jobs:
           elif [ -f output/result.m3u ]; then
             cp output/result.m3u output/user_result.m3u
             python3 filter.py output/user_result.m3u
-          else
-            echo "ERROR: No M3U output found from pipenv run dev"
-            exit 1
           fi
 
-      - name: Commit and push if changed
+      - name: Check Streams with FFprobe
         run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git add .
-          if ! git diff --staged --quiet; then
-            git commit -m "Auto-update IPTV playlist [$(date -u '+%Y-%m-%d %H:%M UTC')]"
-            git push --force
-          fi
+          cat << 'PYEOF' > check.py
+          import subprocess
+          import concurrent.futures
+          from pathlib import Path
+
+          PROBE_TIMEOUT = 9
+          WORKERS = 20
+          m3u_path = Path("output/user_result.m3u")
+
+          pairs = []
+          current = None
+          for line in m3u_path.read_text(encoding="utf-8").splitlines():
+              line = line.strip()
+              if line.startswith("#EXTINF"):
+                  current = line
+              elif current and line and not line.startswith("#"):
+                  pairs.append((current, line))
+                  current = None
+
+          def is_live(url):
+              try:
+                  result = subprocess.run([
+                      "ffprobe", "-v", "quiet", "-timeout", str(PROBE_TIMEOUT*1000000),
+                      "-analyzeduration", "1500000", "-probesize", "150000",
+                      "-i", url, "-show_streams"
+                  ], timeout=PROBE_TIMEOUT+5, capture_output=True)
+                  return result.returncode == 0 and b'codec_name' in result.stdout
+              except:
+                  return False
+
+          print(f"🔍 Checking {len(pairs)} channels...")
+
+          live_pairs = []
+          with concurrent.futures.ThreadPoolExecutor(max_workers=WORKERS) as executor:
+              future_to_pair = {executor.submit(is_live, url): (extinf, url) for extinf, url in pairs}
+              for future in concurrent.futures.as_completed(future_to_pair):
+                  extinf, url = future_to_pair[future]
+                  if future.result():
+                      live_pairs.append((extinf, url))
+                      print("✅ LIVE:", extinf.split(",")[-1])
+                  else:
+                      print("❌ DEAD:", extinf.split(",")[-1])
+
+          out_lines = ["#EXTM3U"]
+          for extinf, url in live_pairs:
+              out_lines.extend([extinf, url])
+
+          m3u_path.write_text("\n".join(out_lines) + "\n", encoding="utf-8")
+          print(f"🎯 FINAL: {len(live_pairs)}/{len(pairs)} live channels")
+          PYEOF
+
+          python3 check.py
