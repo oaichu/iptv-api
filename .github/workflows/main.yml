@@ -39,8 +39,8 @@ jobs:
 
       - name: Debug - Show config
         run: |
-          echo "========== config/config.ini =========="
-          cat config/config.ini || echo "FILE NOT FOUND"
+          echo "========== config/user_config.ini =========="
+          cat config/user_config.ini || echo "FILE NOT FOUND"
           echo ""
           echo "========== user_demo.txt =========="
           echo "Số nhóm: $(grep -c '#genre#' config/user_demo.txt || echo 0)"
@@ -49,13 +49,14 @@ jobs:
       - name: Update IPTV playlist
         run: pipenv run dev
 
-      - name: Post-process M3U (Giữ kênh trong demo + Khớp mờ + Loại trùng)
+      - name: Post-process M3U (Ép đúng nhóm + Giữ kênh trong demo + Loại trùng)
         run: |
           if [ ! -f output/user_result.m3u ]; then
             echo "LỖI: Không tìm thấy output/user_result.m3u"
             exit 1
           fi
 
+          # Dịch tiếng Trung còn sót
           sed -i 's/\$订阅源//g' output/user_result.m3u
           sed -i 's/未匹配频道/Kênh Chưa Phân Loại/g' output/user_result.m3u
           sed -i 's/无结果频道/Kênh Lỗi - Không Chạy/g' output/user_result.m3u
@@ -66,17 +67,21 @@ jobs:
           import re
           from collections import Counter
 
-          # === ĐỌC DANH SÁCH KÊNH ĐƯỢC PHÉP (từ user_demo.txt) ===
-          allowed = set()
+          # === ĐỌC user_demo.txt → TẠO BẢN ĐỒ NHÓM ===
+          group_map = {}
+          current_group = "Kênh Khác"
           demo_path = Path("config/user_demo.txt")
           if demo_path.exists():
               with open(demo_path, "r", encoding="utf-8", errors="ignore") as f:
                   for line in f:
-                      line = line.strip().lower()
-                      if line and not line.endswith("#genre#") and not line.startswith("["):
-                          allowed.add(line)
+                      line = line.strip()
+                      if line.endswith("#genre#"):
+                          current_group = line.replace(",#genre#", "").strip()
+                      elif line and not line.startswith("[") and not line.endswith("#genre#"):
+                          norm = re.sub(r'\s+', ' ', line.lower().strip())
+                          group_map[norm] = current_group
 
-          print(f"Số kênh được phép (demo): {len(allowed)}")
+          print(f"Số kênh được phép (demo): {len(group_map)}")
 
           # === XỬ LÝ M3U ===
           path = Path("output/user_result.m3u")
@@ -92,23 +97,26 @@ jobs:
                   match = re.search(r',\s*(.+)$', line)
                   raw_name = match.group(1).strip().lower() if match else ""
 
-                  # Chuẩn hóa tên: bỏ HD, bỏ khoảng trắng thừa, bỏ dấu câu
                   norm_name = re.sub(r'\s*hd\s*', '', raw_name)
                   norm_name = re.sub(r'\s+', ' ', norm_name).strip()
 
-                  # Kiểm tra khớp mờ: tên demo nằm trong tên quét HOẶC ngược lại
-                  matched = False
-                  for demo_name in allowed:
+                  matched_group = None
+                  for demo_name, grp in group_map.items():
                       if demo_name in norm_name or norm_name in demo_name:
-                          matched = True
+                          matched_group = grp
                           break
 
-                  if matched:
+                  if matched_group:
                       key = norm_name
                       if i + 1 < len(lines) and not lines[i + 1].startswith("#"):
                           url_line = lines[i + 1]
                           if key not in seen:
                               seen.add(key)
+                              # Ép group-title đúng theo demo
+                              if 'group-title="' in line:
+                                  line = re.sub(r'group-title="[^"]*"', f'group-title="{matched_group}"', line)
+                              else:
+                                  line = line.replace("#EXTINF:-1", f'#EXTINF:-1 group-title="{matched_group}"', 1)
                               output.append(line)
                               output.append(url_line)
                       i += 2
@@ -119,7 +127,7 @@ jobs:
 
           total = len(output) // 2
           print(f"\n{'='*60}")
-          print(f"✅ TỔNG SỐ KÊNH SAU KHI LỌC (khớp mờ): {total}")
+          print(f"✅ TỔNG SỐ KÊNH SAU KHI ÉP NHÓM: {total}")
           print(f"{'='*60}")
 
           groups_list = []
@@ -140,7 +148,7 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git add .
           if ! git diff --staged --quiet; then
-            git commit -m "Auto Updated IPTV - Lọc kênh mềm mại hơn"
+            git commit -m "Auto Updated IPTV - Ép nhóm đúng theo user_demo.txt"
             git push --force
           fi
           
