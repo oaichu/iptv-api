@@ -33,11 +33,10 @@ jobs:
       - name: Install dependencies
         run: pipenv --python 3.13 && pipenv install --deploy
 
-      # 直接运行，读取你刚才修改好的 config/config.ini
       - name: Update IPTV playlist
         run: pipenv run dev
 
-      - name: Create Python Filter Script
+      - name: Create Ultimate Filter Script
         run: |
           cat << 'PYEOF' > filter.py
           import re
@@ -46,7 +45,6 @@ jobs:
 
           m3u_file_path = sys.argv[1] if len(sys.argv) > 1 else ""
           if not m3u_file_path or not Path(m3u_file_path).exists():
-              print("Khong co file M3U de xu ly.")
               sys.exit(0)
 
           def remove_chinese(text):
@@ -55,22 +53,16 @@ jobs:
           def clean_name(text):
               if not text: return ""
               t = text.lower().strip()
-              tags = re.findall(r'[\(\[](.*?)[\)\]]', t)
-              quality_tag = ""
-              for tag in tags:
-                  if re.search(r'(?i)\b(fhd|hd|4k|8k|1080p|2k|uhd)\b', tag): quality_tag = " hd"; break
-                  elif re.search(r'(?i)\b(sd|720p)\b', tag): quality_tag = " sd"
-              t = re.sub(r'[\(\[].*?[\)\]]', '', t)
-              t = re.sub(r'(?i)\b(fhd|4k|8k|1080p|2k|uhd)\b', 'hd', t)
-              t = re.sub(r'(?i)\b(sd|720p)\b', 'sd', t)
-              if quality_tag == " hd" and "hd" not in t: t += " hd"
-              elif quality_tag == " sd" and "sd" not in t and "hd" not in t: t += " sd"
-              t = re.sub(r'(?i)\b(hevc|h264|h265|live|backup|du phong)\b', '', t)
+              t = re.sub(r'[\(\[【].*?[\)\]】]', '', t)
+              # Rửa sạch mọi hậu tố chất lượng và từ khóa thừa
+              t = re.sub(r'(?i)\b(fhd|hd|sd|4k|8k|1080p|720p|2k|uhd|hdr|hevc|h264|h265|live|backup|du phong|dự phòng|test|ipv6|ipv4|vietnam|vn)\b', '', t)
               t = remove_chinese(t)
               t = re.sub(r'[^\w\s\+\-]', '', t, flags=re.UNICODE)
+              # Xóa khoảng trắng giữa chữ và số (VTV 1 -> VTV1)
               t = re.sub(r'([a-z])\s+(\d)', r'\1\2', t)
               t = re.sub(r'(\d)\s+([a-z])', r'\1\2', t)
-              return re.sub(r'\s+', ' ', t).strip('+- ')
+              t = re.sub(r'\s+', ' ', t).strip('+- ')
+              return t.strip()
 
           demo_path = Path("config/user_demo.txt")
           groups_order, channels_in_group, current_group = [], {}, None
@@ -94,54 +86,66 @@ jobs:
 
           m3u_path = Path(m3u_file_path)
           lines = m3u_path.read_text(encoding="utf-8", errors="ignore").replace("$订阅源", "").splitlines()
-          grouped, unmatched, seen_urls = {grp: [] for grp in groups_order}, [], set()
-          current_extinf = None
           
+          # Lưu kết quả: {group: [(idx, extinf, url)]}
+          grouped = {grp: [] for grp in groups_order}
+          unmatched = []
+          
+          # CHỐNG LẶP TUYỆT ĐỐI: Mỗi kênh trong Demo chỉ nhận đúng 1 URL đầu tiên
+          added_demo_channels = set() 
+          
+          current_extinf = None
           for line in lines[1:] if lines and lines[0].startswith("#EXTM3U") else lines:
               line = line.strip()
               if not line: continue
               if line.startswith("#EXTINF"): current_extinf = line
               elif current_extinf:
                   url = line
-                  if url not in seen_urls:
-                      parts = current_extinf.split(",")
-                      raw_name = parts[-1].strip() if len(parts) > 1 else ""
-                      if re.match(r'^\d{4}-\d{2}-\d{2}', raw_name):
-                          m = re.search(r'tvg-id="([^"]*)"', current_extinf)
-                          raw_name = m.group(1) if m else raw_name
-                      
-                      display_name = remove_chinese(raw_name).strip()
-                      if not display_name: display_name = raw_name
-                      clean_display = clean_name(display_name)
-                      
-                      matched_grp, matched_idx, matched_demo_name = None, None, None
-                      if clean_display in position_map:
-                          matched_grp, matched_idx, matched_demo_name = position_map[clean_display]
-                      else:
-                          for dc in sorted(position_map.keys(), key=len, reverse=True):
-                              if len(dc) >= 3 and (clean_display == dc or clean_display.startswith(dc + " ") or clean_display.endswith(" " + dc) or (" " + dc + " ") in (" " + clean_display + " ")):
+                  parts = current_extinf.split(",")
+                  raw_name = parts[-1].strip() if len(parts) > 1 else ""
+                  if re.match(r'^\d{4}-\d{2}-\d{2}', raw_name):
+                      m = re.search(r'tvg-id="([^"]*)"', current_extinf)
+                      raw_name = m.group(1) if m else raw_name
+                  
+                  display_name = remove_chinese(raw_name).strip()
+                  if not display_name: display_name = raw_name
+                  clean_display = clean_name(display_name)
+                  
+                  matched_grp, matched_idx, matched_demo_name = None, None, None
+                  
+                  # 1. Ưu tiên khớp chính xác 100%
+                  if clean_display in position_map:
+                      matched_grp, matched_idx, matched_demo_name = position_map[clean_display]
+                  else:
+                      # 2. Khớp biên (Word Boundary) - Chống nhầm VTV1 với VTV10
+                      for dc in sorted(position_map.keys(), key=len, reverse=True):
+                          if len(dc) >= 2:
+                              pattern = r'\b' + re.escape(dc) + r'\b'
+                              if re.search(pattern, clean_display) or re.search(pattern, dc.replace(' ', '')):
                                   matched_grp, matched_idx, matched_demo_name = position_map[dc]
                                   break
-                      
-                      if matched_grp:
-                          seen_urls.add(url)
+                  
+                  if matched_grp:
+                      # Nếu kênh này chưa được thêm vào -> Thêm vào (Chống lặp)
+                      if matched_demo_name not in added_demo_channels:
+                          added_demo_channels.add(matched_demo_name)
                           base_info = parts[0]
                           if 'group-title="' in base_info: base_info = re.sub(r'group-title="[^"]*"', f'group-title="{matched_grp}"', base_info)
                           else: base_info = base_info.replace("#EXTINF:-1", f'#EXTINF:-1 group-title="{matched_grp}"', 1)
                           grouped[matched_grp].append((matched_idx, f"{base_info},{matched_demo_name}", url))
-                      else: unmatched.append((current_extinf, url))
+                  else:
+                      unmatched.append((current_extinf, url))
                   current_extinf = None
 
           output_lines, total = ['#EXTM3U'], 0
+          
+          # Xuất kênh theo đúng thứ tự Demo
           for grp in groups_order:
-              ch_links = {}
               for idx, ext, url in sorted(grouped[grp], key=lambda x: x[0]):
-                  ch = ext.split(",")[-1]
-                  if ch not in ch_links: ch_links[ch] = []
-                  if len(ch_links[ch]) < 3: ch_links[ch].append((ext, url))
-              for links in ch_links.values():
-                  for ext, url in links: output_lines.extend([ext, url]); total += 1
+                  output_lines.extend([ext, url])
+                  total += 1
 
+          # Xử lý kênh rác (Rửa sạch tiếng Trung, ném vào Kênh Khác)
           if unmatched:
               valid, seen_u = [], set()
               for ext, url in unmatched:
@@ -170,8 +174,6 @@ jobs:
           elif [ -f output/result.m3u ]; then
             cp output/result.m3u output/user_result.m3u
             python3 filter.py output/user_result.m3u
-          else
-            echo "Khong tim thay file M3U"
           fi
 
       - name: Commit and push if changed
