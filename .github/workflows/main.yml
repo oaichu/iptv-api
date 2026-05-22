@@ -3,16 +3,11 @@ name: 'Update schedule'
 "on":
   workflow_dispatch:
   schedule:
-    - cron: '0 */12 * * *' # Tự động chạy 12h/lần
-
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    - cron: '0 */12 * * *'
 
 jobs:
   push:
     runs-on: ubuntu-latest
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - name: Set branch name
@@ -39,12 +34,11 @@ jobs:
       - name: Install dependencies
         run: pipenv --python 3.13 && pipenv install --deploy
 
-      # [FIX LỖI] Copy user_config.ini đè lên config.ini để iptv-api đọc được
       - name: Apply custom config
         run: |
           if [ -f config/user_config.ini ]; then
             cp config/user_config.ini config/config.ini
-            echo "✅ Đã áp dụng user_config.ini"
+            echo "Da ap dung user_config.ini"
           fi
 
       - name: Update IPTV playlist
@@ -180,7 +174,6 @@ jobs:
           output_lines = ['#EXTM3U']
           total_channels = 0
 
-          # 1. Xuất kênh theo đúng thứ tự Demo (Mỗi kênh giữ tối đa 3 link dự phòng)
           for grp in groups_order:
               sorted_entries = sorted(grouped[grp], key=lambda x: x[0])
               channel_links = {}
@@ -196,7 +189,6 @@ jobs:
                       output_lines.append(url_line)
                       total_channels += 1
 
-          # 2. Xuất kênh không có trong Demo (Rửa sạch tiếng Trung, ném vào Kênh Khác)
           if unmatched:
               seen_unmatched = set()
               valid_unmatched = []
@@ -211,9 +203,9 @@ jobs:
                   
                   seen_unmatched.add(url)
                   if 'group-title="' not in base_info:
-                      base_info = base_info.replace("#EXTINF:-1", '#EXTINF:-1 group-title="Kênh Khác"')
+                      base_info = base_info.replace("#EXTINF:-1", '#EXTINF:-1 group-title="Kenh Khac"')
                   else:
-                      base_info = re.sub(r'group-title="[^"]*"', 'group-title="Kênh Khác"', base_info)
+                      base_info = re.sub(r'group-title="[^"]*"', 'group-title="Kenh Khac"', base_info)
                   valid_unmatched.append((f"{base_info},{clean_name_text}", url))
                   
               if valid_unmatched:
@@ -233,6 +225,6 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git add .
           if ! git diff --staged --quiet; then
-            git commit -m "Update IPTV playlist and fix config"
+            git commit -m "Update IPTV playlist"
             git push --force
           fi
