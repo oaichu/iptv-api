@@ -39,7 +39,7 @@ jobs:
 
       - name: Debug - Show config
         run: |
-          echo "========== config/user_config.ini =========="
+          echo "========== user_config.ini =========="
           cat config/user_config.ini || echo "FILE NOT FOUND"
           echo ""
           echo "========== user_demo.txt =========="
@@ -49,14 +49,13 @@ jobs:
       - name: Update IPTV playlist
         run: pipenv run dev
 
-      - name: Post-process M3U (Ép đúng nhóm + Giữ kênh trong demo + Loại trùng)
+      - name: Post-process M3U (Khớp tên thông minh cho kênh VN + Ép nhóm + Loại trùng)
         run: |
           if [ ! -f output/user_result.m3u ]; then
             echo "LỖI: Không tìm thấy output/user_result.m3u"
             exit 1
           fi
 
-          # Dịch tiếng Trung còn sót
           sed -i 's/\$订阅源//g' output/user_result.m3u
           sed -i 's/未匹配频道/Kênh Chưa Phân Loại/g' output/user_result.m3u
           sed -i 's/无结果频道/Kênh Lỗi - Không Chạy/g' output/user_result.m3u
@@ -97,12 +96,15 @@ jobs:
                   match = re.search(r',\s*(.+)$', line)
                   raw_name = match.group(1).strip().lower() if match else ""
 
+                  # Chuẩn hóa mạnh hơn (dành cho kênh VN)
                   norm_name = re.sub(r'\s*hd\s*', '', raw_name)
                   norm_name = re.sub(r'\s+', ' ', norm_name).strip()
+                  norm_name = re.sub(r'[^\w\s]', '', norm_name)  # bỏ dấu câu
 
                   matched_group = None
                   for demo_name, grp in group_map.items():
-                      if demo_name in norm_name or norm_name in demo_name:
+                      # Khớp mềm mại: chứa nhau hoặc từ đầu khớp
+                      if demo_name in norm_name or norm_name in demo_name or norm_name.startswith(demo_name[:4]):
                           matched_group = grp
                           break
 
@@ -112,7 +114,7 @@ jobs:
                           url_line = lines[i + 1]
                           if key not in seen:
                               seen.add(key)
-                              # Ép group-title đúng theo demo
+                              # Ép group-title đúng
                               if 'group-title="' in line:
                                   line = re.sub(r'group-title="[^"]*"', f'group-title="{matched_group}"', line)
                               else:
@@ -127,7 +129,7 @@ jobs:
 
           total = len(output) // 2
           print(f"\n{'='*60}")
-          print(f"✅ TỔNG SỐ KÊNH SAU KHI ÉP NHÓM: {total}")
+          print(f"✅ TỔNG SỐ KÊNH SAU KHI ÉP NHÓM & KHỚP MỀM: {total}")
           print(f"{'='*60}")
 
           groups_list = []
@@ -148,7 +150,7 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git add .
           if ! git diff --staged --quiet; then
-            git commit -m "Auto Updated IPTV - Ép nhóm đúng theo user_demo.txt"
+            git commit -m "Auto Updated IPTV - Khớp tên thông minh hơn cho kênh VN"
             git push --force
           fi
           
