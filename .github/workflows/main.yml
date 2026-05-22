@@ -9,7 +9,6 @@ env:
 jobs:
   push:
     runs-on: ubuntu-latest
-
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
@@ -41,12 +40,18 @@ jobs:
       - name: Update IPTV playlist
         run: pipenv run dev
 
-      - name: Clean, translate and regroup channels
+      - name: Clean, translate and regroup channels (FIXED ORDER)
         run: |
           if [ ! -f output/user_result.m3u ]; then
             echo "Không tìm thấy output/user_result.m3u"
+            find output -maxdepth 3 -type f || true
             exit 1
           fi
+
+          sed -i 's/\$订阅源//g' output/user_result.m3u
+          sed -i 's/未匹配频道/Kênh Chưa Phân Loại/g' output/user_result.m3u
+          sed -i 's/无结果频道/Kênh Lỗi - Không Chạy/g' output/user_result.m3u
+          sed -i 's/更新时间/Thời Gian Cập Nhật/g' output/user_result.m3u
 
           python3 <<'PY'
           import re
@@ -54,120 +59,220 @@ jobs:
 
           path = Path("output/user_result.m3u")
           text = path.read_text(encoding="utf-8", errors="ignore")
-          
-          # Việt hóa cụm từ hệ thống
-          text = text.replace("未匹配频道", "Kênh Chưa Phân Loại")
-          text = text.replace("无结果频道", "Kênh Lỗi - Không Chạy")
-          text = text.replace("更新时间", "Thời Gian Cập Nhật")
-          text = text.replace("$订阅源", "")
-          
-          lines = text.splitlines()
-          output_lines = []
-          
-          # Cắt dải ngày giờ rác ở đầu file
-          if lines and lines[0].startswith("#EXTM3U"):
-              first_line = lines[0]
-              first_line = re.sub(r'tvg-name="[^"]*"', '', first_line)
-              first_line = re.sub(r'group-title="[^"]*"', '', first_line)
-              output_lines.append(first_line.split(",")[0].strip())
-              start_idx = 1
-          else:
-              start_idx = 0
 
-          # BỘ LỌC CHUẨN XÁC: Đặt theo thứ tự ưu tiên gắt gao (Cáp/Đài lớn trước, Thể thao/Phim chung sau)
-          categories_mapping = [
-              ("06. VTVcab - Truyền Hình Cáp Việt Nam", [r"VTV\s?cab", r"ON\s?Sports", r"ON\s?Football", r"ON\s?Golf", r"ON\s?Movies", r"ON\s?Music", r"ON\s?Kids", r"ON\s?Vie", r"ON\s?Cine", r"ON\s?Trending", r"ON\s?E\b"]),
-              ("07. SCTV", [r"SCTV"]),
-              ("08. FPT Play - FPT TV", [r"FPT"]),
-              ("09. K Plus", [r"K\+", r"KPlus", r"K\s?Plus"]),
-              ("01. VTV - Kênh Quốc Gia", [r"^VTV\s?\d+", r"\bVTV\s?\d+\b", r"VTV\s?Cần\s?Thơ"]),
-              ("02. HTV - TP.HCM", [r"^HTV\s?\d+", r"\bHTV\s?\d+\b", r"HTVC", r"HTV\s?Thể\s?Thao", r"HTV\s?Sports", r"HTV\s?Key"]),
-              ("11. Thể Thao Việt Nam", [r"Bóng\s?Đá", r"Thể\s?Thao", r"The\s?Thao"]),
-              ("12. Thể Thao Quốc Tế", [r"ESPN", r"Fox\s?Sports", r"Sky\s?Sports", r"beIN", r"Eurosport", r"DAZN", r"CBS", r"TNT", r"BT\s?Sport", r"Premier\s?League", r"NBA", r"NFL", r"MLB", r"Golf", r"WWE", r"UFC"]),
-              ("03. Địa Phương - Miền Bắc", [r"Hà\s?Nội", r"Hanoi", r"Hải\s?Phòng", r"QTV", r"Quảng\s?Ninh", r"Bắc\s?Ninh", r"Bắc\s?Giang", r"Hải\s?Dương", r"Hưng\s?Yên", r"Thái\s?Bình", r"Nam\s?Định", r"Ninh\s?Bình", r"Thanh\s?Hóa", r"Nghệ\s?An", r"NTV", r"Hà\s?Tĩnh", r"Tuyên\s?Quang", r"Lào\s?Cai", r"Yên\s?Bái", r"Phú\s?Thọ", r"Thái\s?Nguyên", r"Cao\s?Bằng", r"Bắc\s?Kạn", r"Lạng\s?Sơn", r"Điện\s?Biên", r"Lai\s?Châu", r"Sơn\s?La", r"Hòa\s?Bình", r"THP"]),
-              ("04. Địa Phương - Miền Trung", [r"Quảng\s?Bình", r"Quảng\s?Trị", r"Huế", r"Hue", r"TRT", r"Đà\s?Nẵng", r"Da\s?Nang", r"DRT", r"Quảng\s?Nam", r"QRT", r"Quảng\s?Ngãi", r"PTQ", r"Bình\s?Định", r"BTV", r"Phú\s?Yên", r"Khánh\s?Hòa", r"KTV", r"Ninh\s?Thuận", r"Bình\s?Thuận", r"Kon\s?Tum", r"Gia\s?Lai", r"THGL", r"Đắk\s?Lắk", r"Dak\s?Lak", r"Đắk\s?Nông", r"Lâm\s?Đồng", r"LTV"]),
-              ("05. Địa Phương - Miền Nam", [r"THVL", r"THĐT", r"THDT", r"THAG", r"THKG", r"THLA", r"THBT", r"THTG", r"THTPCT", r"HGTV", r"STV", r"BLTV", r"BPTV", r"Bình\s?Dương", r"Đồng\s?Nai", r"DNRTV", r"Bà\s?Rịa", r"Vũng\s?Tàu", r"BRT", r"Long\s?An", r"Tiền\s?Giang", r"Bến\s?Tre", r"Trà\s?Vinh", r"Đồng\s?Tháp", r"An\s?Giang", r"Kiên\s?Giang", r"Cần\s?Thơ", r"Hậu\s?Giang", r"Sóc\s?Trăng", r"Bạc\s?Liêu", r"Cà\s?Mau", r"CTV", r"Tây\s?Ninh", r"TTV11", r"Bình\s?Phước"]),
-              ("10. Tin Tức - Thời Sự", [r"VNews", r"Thông\s?Tấn", r"Quốc\s?Hội", r"Nhân\s?Dân", r"ANTV", r"QPVN", r"Quoc\s?Hoi"]),
-              ("13. Phim - Series", [r"HBO", r"Cinemax", r"Star\s?Movies", r"AXN", r"Warner", r"Hollywood", r"Box\s?Movie", r"Kix", r"Blue\s?Ant", r"Phim", r"Movies", r"Cine"]),
-              ("14. Giải Trí - Tổng Hợp", [r"Yeah1", r"Today", r"Vie", r"Giải\s?Trí", r"Entertainment", r"General"]),
-              ("15. Thiếu Nhi - Giáo Dục", [r"Cartoon\s?Network", r"Disney", r"Nickelodeon", r"Nick", r"Baby\s?TV", r"CBeebies", r"Da\s?Vinci", r"Kids", r"Thiếu\s?Nhi"]),
-              ("16. Khoa Học - Khám Phá", [r"Discovery", r"Animal\s?Planet", r"National\s?Geographic", r"Nat\s?Geo", r"History", r"BBC\s?Earth", r"TLC", r"Travel", r"Science", r"Khám\s?Phá"]),
-              ("17. Âm Nhạc", [r"MTV", r"Channel\s?V", r"iTV", r"Music", r"Âm\s?Nhạc", r"Ca\s?Nhạc"]),
-              ("18. Kênh Trung Quốc", [r"CCTV", r"CGTN", r"Dragon", r"Hunan", r"Jiangsu", r"Zhejiang", r"Phoenix", r"Shenzhen", r"Guangdong", r"Beijing", r"Shanghai"]),
-              ("19. Kênh Quốc Tế", [r"TV5Monde", r"France\s?24", r"\bDW\b", r"Euronews", r"Al\s?Jazeera", r"CNBC", r"Bloomberg", r"CNA", r"NHK", r"Arirang", r"KBS", r"RT", r"TRT", r"ABC\s?News", r"CBS\s?News", r"NBC\s?News", r"Fox\s?News", r"CNN", r"BBC"])
+          groups = [
+              # === ƯU TIÊN CAO NHẤT: THỂ THAO QUỐC TẾ (kiểm tra trước để không bị các nhóm khác hớt) ===
+              ("12. Thể Thao Quốc Tế", [
+                  r"ESPN", r"Fox\s?Sports", r"Sky\s?Sports", r"beIN", r"bein",
+                  r"Eurosport", r"DAZN", r"CBS\s?Sports", r"TNT\s?Sports",
+                  r"BT\s?Sport", r"Premier\s?League", r"Champions\s?League",
+                  r"NBA\s?TV", r"NFL\s?Network", r"MLB\s?Network", r"Golf\s?Channel",
+                  r"WWE", r"UFC", r"Fight\s?Sports", r"SuperSport", r"Sport\s?TV\b"
+              ]),
+
+              # === THỂ THAO VIỆT NAM (sau quốc tế để không hớt ESPN/Sky) ===
+              ("11. Thể Thao Việt Nam", [
+                  r"Bóng Đá\s?TV", r"Bong\s?Da\s?TV", r"Thể Thao\s?TV", r"The\s?Thao\s?TV",
+                  r"HTV\s?Thể\s?Thao", r"HTV\s?The\s?Thao", r"HTV\s?Sports",
+                  r"ON\s?Sports\s?News", r"ON\s?Football", r"ON\s?Golf",
+                  r"ON\s?Sports\b", r"K\+\s?Sport", r"K\+\s?Sports",
+                  r"SCTV\s?Thể\s?Thao", r"SCTV\s?Sports",
+                  r"VTV6", r"VTV\s?6\b"
+              ]),
+
+              # === VTV CAB (kiểm tra sớm để ON Sports/ON Movies không bị nhóm khác hớt) ===
+              ("06. VTVcab - Truyền Hình Cáp Việt Nam", [
+                  r"VTV\s?cab", r"VTVcab",
+                  r"\bON\s?Sports\b", r"\bON\s?Football\b", r"\bON\s?Golf\b",
+                  r"\bON\s?Movies\b", r"\bON\s?Music\b", r"\bON\s?Kids\b",
+                  r"\bON\s?Vie\b", r"\bON\s?Cine\b", r"\bON\s?Trending\b",
+                  r"\bON\s?E\s?Channel\b"
+              ]),
+
+              # === K PLUS (trước FPT và SCTV) ===
+              ("09. K Plus", [
+                  r"\bK\+\b", r"\bKPlus\b", r"K\+\s?Sport", r"K\+\s?Sports",
+                  r"K\+\s?Cine", r"K\+\s?Life", r"K\+\s?Kids", r"K\+\s?Action"
+              ]),
+
+              # === SCTV ===
+              ("07. SCTV", [
+                  r"\bSCTV\s?\d+\b",
+                  r"SCTV\s?Phim", r"SCTV\s?Thể\s?Thao", r"SCTV\s?The\s?Thao",
+                  r"SCTV\s?Sports", r"SCTV\s?Ca\s?Nhạc", r"SCTV\s?Ca\s?Nhac",
+                  r"SCTV\s?Thiếu\s?Nhi", r"SCTV\s?Thieu\s?Nhi"
+              ]),
+
+              # === FPT ===
+              ("08. FPT Play - FPT TV", [
+                  r"\bFPT\b", r"FPT\s?Play", r"FPT\s?TV"
+              ]),
+
+              # === HTV (sau thể thao, trước VTV) ===
+              ("02. HTV - TP.HCM", [
+                  r"\bHTV\s?1\b", r"\bHTV\s?2\b", r"\bHTV\s?3\b", r"\bHTV\s?4\b",
+                  r"\bHTV\s?7\b", r"\bHTV\s?9\b", r"\bHTVC\b",
+                  r"HTV\s?Key", r"HTV\s?Sports", r"HTV\s?Thể\s?Thao", r"HTV\s?The\s?Thao"
+              ]),
+
+              # === VTV (trừ VTV6 đã vào thể thao, VTV7 vào thiếu nhi) ===
+              ("01. VTV - Kênh Quốc Gia", [
+                  r"\bVTV\s?1\b", r"\bVTV\s?2\b", r"\bVTV\s?3\b", r"\bVTV\s?4\b",
+                  r"\bVTV\s?5\b", r"\bVTV\s?8\b", r"\bVTV\s?9\b", r"\bVTV\s?10\b"
+              ]),
+
+              # === ĐỊA PHƯƠNG MIỀN BẮC ===
+              ("03. Địa Phương - Miền Bắc", [
+                  r"Hà\s?Nội", r"Ha\s?Noi", r"Hanoi",
+                  r"Hải\s?Phòng", r"Hai\s?Phong", r"\bTHP\b",
+                  r"Quảng\s?Ninh", r"Quang\s?Ninh", r"\bQTV\b",
+                  r"Bắc\s?Ninh", r"Bac\s?Ninh", r"Bắc\s?Giang", r"Bac\s?Giang",
+                  r"Hải\s?Dương", r"Hai\s?Duong", r"Hưng\s?Yên", r"Hung\s?Yen",
+                  r"Thái\s?Bình", r"Thai\s?Binh", r"Nam\s?Định", r"Nam\s?Dinh",
+                  r"Ninh\s?Bình", r"Ninh\s?Binh", r"Thanh\s?Hóa", r"Thanh\s?Hoa",
+                  r"Nghệ\s?An", r"Nghe\s?An", r"\bNTV\b", r"Hà\s?Tĩnh", r"Ha\s?Tinh",
+                  r"Tuyên\s?Quang", r"Tuyen\s?Quang", r"Lào\s?Cai", r"Lao\s?Cai",
+                  r"Yên\s?Bái", r"Yen\s?Bai", r"Phú\s?Thọ", r"Phu\s?Tho",
+                  r"Thái\s?Nguyên", r"Thai\s?Nguyen", r"Cao\s?Bằng", r"Cao\s?Bang",
+                  r"Bắc\s?Kạn", r"Bac\s?Kan", r"Lạng\s?Sơn", r"Lang\s?Son",
+                  r"Điện\s?Biên", r"Dien\s?Bien", r"Lai\s?Châu", r"Lai\s?Chau",
+                  r"Sơn\s?La", r"Son\s?La", r"Hòa\s?Bình", r"Hoa\s?Binh"
+              ]),
+
+              # === ĐỊA PHƯƠNG MIỀN TRUNG ===
+              ("04. Địa Phương - Miền Trung", [
+                  r"Quảng\s?Bình", r"Quang\s?Binh", r"Quảng\s?Trị", r"Quang\s?Tri",
+                  r"\bHuế\b", r"\bHue\b", r"\bTRT\b",
+                  r"Đà\s?Nẵng", r"Da\s?Nang", r"\bDRT\b",
+                  r"Quảng\s?Nam", r"Quang\s?Nam", r"\bQRT\b",
+                  r"Quảng\s?Ngãi", r"Quang\s?Ngai", r"\bPTQ\b",
+                  r"Bình\s?Định", r"Binh\s?Dinh", r"Phú\s?Yên", r"Phu\s?Yen",
+                  r"Khánh\s?Hòa", r"Khanh\s?Hoa", r"\bKTV\b",
+                  r"Ninh\s?Thuận", r"Ninh\s?Thuan", r"Bình\s?Thuận", r"Binh\s?Thuan",
+                  r"Kon\s?Tum", r"Gia\s?Lai", r"\bTHGL\b",
+                  r"Đắk\s?Lắk", r"Dak\s?Lak", r"Đắk\s?Nông", r"Dak\s?Nong",
+                  r"Lâm\s?Đồng", r"Lam\s?Dong"
+              ]),
+
+              # === ĐỊA PHƯƠNG MIỀN NAM ===
+              ("05. Địa Phương - Miền Nam", [
+                  r"\bTHVL\b", r"\bTHĐT\b", r"\bTHDT\b", r"\bTHAG\b",
+                  r"\bTHKG\b", r"\bTHLA\b", r"\bTHBT\b", r"\bTHTG\b",
+                  r"\bTHTPCT\b", r"\bHGTV\b", r"\bSTV\b", r"\bBLTV\b", r"\bBPTV\b",
+                  r"Bình\s?Dương", r"Binh\s?Duong", r"\bBTV\b",
+                  r"Đồng\s?Nai", r"Dong\s?Nai", r"\bDNRTV\b",
+                  r"Bà\s?Rịa", r"Ba\s?Ria", r"Vũng\s?Tàu", r"Vung\s?Tau", r"\bBRT\b",
+                  r"Long\s?An", r"Tiền\s?Giang", r"Tien\s?Giang",
+                  r"Bến\s?Tre", r"Ben\s?Tre", r"Trà\s?Vinh", r"Tra\s?Vinh",
+                  r"Đồng\s?Tháp", r"Dong\s?Thap", r"An\s?Giang",
+                  r"Kiên\s?Giang", r"Kien\s?Giang", r"Cần\s?Thơ", r"Can\s?Tho",
+                  r"Hậu\s?Giang", r"Hau\s?Giang", r"Sóc\s?Trăng", r"Soc\s?Trang",
+                  r"Bạc\s?Liêu", r"Bac\s?Lieu", r"Cà\s?Mau", r"Ca\s?Mau",
+                  r"Tây\s?Ninh", r"Tay\s?Ninh", r"Bình\s?Phước", r"Binh\s?Phuoc"
+              ]),
+
+              # === TIN TỨC ===
+              ("10. Tin Tức - Thời Sự", [
+                  r"\bVNews\b", r"Thông\s?Tấn", r"Thong\s?Tan",
+                  r"Quốc\s?Hội", r"Quoc\s?Hoi", r"Nhân\s?Dân", r"Nhan\s?Dan",
+                  r"\bANTV\b", r"\bQPVN\b", r"CNN", r"BBC\s?World",
+                  r"France\s?24", r"\bDW\b", r"Euronews", r"Al\s?Jazeera",
+                  r"\bCNBC\b", r"\bBloomberg\b", r"\bCNA\b", r"Channel\s?News\s?Asia",
+                  r"NHK\s?World", r"Arirang\s?TV"
+              ]),
+
+              # === THIẾU NHI (sau VTV để VTV7 không bị VTV hớt) ===
+              ("15. Thiếu Nhi - Giáo Dục", [
+                  r"VTV7", r"VTV\s?7\b", r"HTV3", r"HTV\s?3\b",
+                  r"ON\s?Kids", r"K\+\s?Kids",
+                  r"Cartoon", r"Disney", r"Nickelodeon", r"Nick\s?Jr",
+                  r"Baby\s?TV", r"CBeebies", r"Da\s?Vinci",
+                  r"Discovery\s?Kids", r"Thiếu\s?Nhi", r"Thieu\s?Nhi",
+                  r"Giáo\s?Dục", r"Giao\s?Duc"
+              ]),
+
+              # === KHOA HỌC ===
+              ("16. Khoa Học - Khám Phá", [
+                  r"Discovery\s?(Channel|Science)", r"Animal\s?Planet",
+                  r"National\s?Geographic", r"Nat\s?Geo",
+                  r"\bHistory\b", r"BBC\s?Earth", r"\bTLC\b",
+                  r"Travel\s?Channel", r"Science"
+              ]),
+
+              # === PHIM ===
+              ("13. Phim - Series", [
+                  r"\bHBO\b", r"Cinemax", r"Star\s?Movies", r"\bAXN\b",
+                  r"Warner\s?TV", r"Hollywood", r"Box\s?Movie", r"\bKix\b",
+                  r"Blue\s?Ant", r"ON\s?Movies", r"ON\s?Cine",
+                  r"K\+\s?Cine", r"K\+\s?Action",
+                  r"SCTV\s?Phim", r"HTVC\s?Phim"
+              ]),
+
+              # === GIẢI TRÍ ===
+              ("14. Giải Trí - Tổng Hợp", [
+                  r"Yeah1", r"TodayTV", r"Vie\s?(Channel|Giải\s?Trí|Giai\s?Tri)",
+                  r"ON\s?Vie", r"ON\s?Trending",
+                  r"SCTV\s?[67]|SCTV\s?13",
+                  r"Entertainment", r"General"
+              ]),
+
+              # === ÂM NHẠC ===
+              ("17. Âm Nhạc", [
+                  r"\bMTV\b", r"Channel\s?V", r"ON\s?Music",
+                  r"Ca\s?Nhạc", r"Ca\s?Nhac", r"\bMusic\b", r"\biTV\b"
+              ]),
+
+              # === TRUNG QUỐC ===
+              ("18. Kênh Trung Quốc", [
+                  r"\bCCTV\b", r"\bCGTN\b", r"Dragon\s?TV", r"Hunan\s?TV",
+                  r"Jiangsu\s?TV", r"Zhejiang\s?TV", r"Phoenix\s?TV",
+                  r"Shenzhen\s?TV", r"Guangdong\s?TV", r"Beijing\s?TV", r"Shanghai\s?TV"
+              ]),
+
+              # === QUỐC TẾ (còn lại) ===
+              ("19. Kênh Quốc Tế", [
+                  r"TV5Monde", r"France\s?24", r"\bDW\b", r"Euronews",
+                  r"Al\s?Jazeera", r"\bNHK\b", r"Arirang", r"KBS\s?World",
+                  r"\bRT\b", r"TRT\s?World",
+                  r"ABC\s?News", r"CBS\s?News", r"NBC\s?News", r"Fox\s?News"
+              ]),
           ]
 
-          current_extinf = None
-          for i in range(start_idx, len(lines)):
-              line = lines[i].strip()
-              if not line:
-                  continue
+          def detect_group(line):
+              for group_name, patterns in groups:
+                  for pattern in patterns:
+                      if re.search(pattern, line, flags=re.IGNORECASE):
+                          return group_name
+              return "20. Kênh Chưa Phân Loại"
+
+          output_lines = []
+          for line in text.splitlines():
               if line.startswith("#EXTINF"):
-                  current_extinf = line
-              else:
-                  if current_extinf:
-                      if "Thời Gian Cập Nhật" in current_extinf:
-                          current_extinf = None
-                          continue
-                      
-                      url = line.strip()
-                      parts = current_extinf.split(",")
-                      channel_name = parts[-1].strip() if len(parts) > 1 else ""
-                      
-                      # Cạo chữ Hán và ký tự thừa
-                      channel_name = re.sub(r'[\u4e00-\u9fff]', '', channel_name)
-                      channel_name = re.sub(r'\(\s*\)', '', channel_name)
-                      channel_name = re.sub(r'^[-_|\s]+|[-_|\s]+$', '', channel_name).strip()
-                      
-                      # Fix lỗi hiển thị ngày giờ (Nếu tên trống do cạo chữ Hán, lấy ID thay thế)
-                      if not channel_name or re.match(r'^\d{4}-\d{2}-\d{2}', channel_name):
-                          match_id = re.search(r'tvg-id="([^"]*)"', current_extinf)
-                          if match_id:
-                              channel_name = match_id.group(1)
-                          else:
-                              match_name = re.search(r'tvg-name="([^"]*)"', current_extinf)
-                              if match_name:
-                                  channel_name = match_name.group(1)
-                      
-                      # Đảm bảo cạo lần 2 cho sạch bóng chữ Tàu
-                      channel_name = re.sub(r'[\u4e00-\u9fff]', '', channel_name).strip()
-                      
-                      # BỘ LỌC CHỈ TÌM TRONG TÊN KÊNH VÀ ID (TUYỆT ĐỐI BỎ QUA LOGO URL)
-                      match_id_str = ""
-                      match_id = re.search(r'tvg-id="([^"]*)"', current_extinf)
-                      if match_id:
-                          match_id_str = match_id.group(1)
-                      
-                      search_string = channel_name + " " + match_id_str
-                      
-                      assigned_group = "20. Kênh Chưa Phân Loại"
-                      for group_name, patterns in categories_mapping:
-                          if any(re.search(p, search_string, re.IGNORECASE) for p in patterns):
-                              assigned_group = group_name
-                              break
-                      
-                      base_info = parts[0]
-                      if 'group-title="' in base_info:
-                          base_info = re.sub(r'group-title="[^"]*"', f'group-title="{assigned_group}"', base_info)
-                      else:
-                          base_info = base_info.replace("#EXTINF:-1", f'#EXTINF:-1 group-title="{assigned_group}"', 1)
-                      
-                      output_lines.append(f"{base_info},{channel_name}")
-                      output_lines.append(url)
-                      current_extinf = None
+                  group = detect_group(line)
+                  if 'group-title="' in line:
+                      line = re.sub(r'group-title="[^"]*"', f'group-title="{group}"', line)
+                  else:
+                      line = line.replace("#EXTINF:-1", f'#EXTINF:-1 group-title="{group}"', 1)
+              output_lines.append(line)
 
           path.write_text("\n".join(output_lines) + "\n", encoding="utf-8")
           PY
 
-          echo "===== THỐNG KÊ KẾT QUẢ DANH SÁCH TỪNG NHÓM ====="
-          grep 'group-title=' output/user_result.m3u | sed 's/.*group-title="\([^"]*\)".*/\1/' | sort | uniq -c || true
-      
+          echo ""
+          echo "===== KẾT QUẢ SAU KHI PHÂN NHÓM ====="
+          echo "Tổng số kênh:"
+          grep -c '^#EXTINF' output/user_result.m3u || true
+          echo ""
+          echo "Phân bổ theo nhóm:"
+          grep '^#EXTINF' output/user_result.m3u | sed -n 's/.*group-title="\([^"]*\)".*/\1/p' | sort | uniq -c | sort -rn || true
+
       - name: Commit and push if changed
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add .
           if ! git diff --staged --quiet; then
-            git commit -m "Fixed grouping priority and strictly removed Chinese characters"
+            git commit -m "Fix channel grouping order & accuracy"
             git push --force
           fi
+          
