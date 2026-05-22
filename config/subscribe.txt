@@ -1,6 +1,6 @@
-https://raw.githubusercontent.com/iptv-org/iptv/master/streams/vn.m3u
-https://raw.githubusercontent.com/iptv-org/iptv/master/streams/cn.m3u
-
 # https://iptv.b2og.com
 # https://raw.githubusercontent.com/FreedomLive/iptv/master/iptv-all.m3u
 # https://raw.githubusercontent.com/iptv-org/iptv/master/streams/int.m3u
+https://raw.githubusercontent.com/iptv-org/iptv/master/streams/cn.m3u
+
+# https://raw.githubusercontent.com/iptv-org/iptv/master/streams/vn.m3u
