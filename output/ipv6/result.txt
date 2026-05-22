@@ -20,9 +20,6 @@ Tin Tức - Thời Sự VN,#genre#
 
 Tin Tức Quốc Tế,#genre#
 Euronews,https://jmp2.uk/plu-60d3583ef310610007fb02b1.m3u8
-Euronews,https://jmp2.uk/plu-61b86ea479a4390007c6d5fc.m3u8
-Euronews,https://jmp2.uk/plu-61de8e502c8e9400077e5de7.m3u8
-Euronews,https://jmp2.uk/plu-61de90a47365340007f77c27.m3u8
 
 Thể Thao Việt Nam,#genre#
 
@@ -30,7 +27,6 @@ Thể Thao Quốc Tế,#genre#
 
 Phim Truyện,#genre#
 Pluto TV Movies,https://jmp2.uk/plu-5c5c3b948002db3c3e0b262e.m3u8
-Pluto TV Movies,https://jmp2.uk/plu-5ad8d3a31b95267e225e4e09.m3u8
 
 Thiếu Nhi,#genre#
 
@@ -49,16 +45,12 @@ CCTV-6,http://[2409:8087:8:21::18]:6610/otttv.bj.chinamobile.com/PLTV/88888888/2
 CCTV-7,http://[2409:8087:8:21::18]:6610/otttv.bj.chinamobile.com/PLTV/88888888/224/3221226946/1.m3u8?
 CCTV-8,http://[2409:8087:8:21::18]:6610/otttv.bj.chinamobile.com/PLTV/88888888/224/3221226485/1.m3u8?
 CCTV-9,https://xykt-fix.github.io/Y77.m3u8
-CCTV-9,http://[2409:8087:8:21::18]:6610/otttv.bj.chinamobile.com/PLTV/88888888/224/3221226944/1.m3u8?
 CCTV-10,http://[2409:8087:8:21::18]:6610/otttv.bj.chinamobile.com/PLTV/88888888/224/3221226937/1.m3u8?
 CCTV-11,https://xykt-fix.github.io/play/a02b/index.m3u8
-CCTV-11,http://[2409:8087:8:21::18]:6610/otttv.bj.chinamobile.com/PLTV/88888888/224/3221226334/1.m3u8?
 CCTV-12,http://[2409:8087:8:21::18]:6610/otttv.bj.chinamobile.com/PLTV/88888888/224/3221226942/1.m3u8?
 CCTV-13,https://cdn3.163189.xyz/163189/cctv13
-CCTV-13,http://[2409:8087:8:21::18]:6610/otttv.bj.chinamobile.com/PLTV/88888888/224/3221226316/1.m3u8?
 CCTV-14,http://[2409:8087:8:21::18]:6610/otttv.bj.chinamobile.com/PLTV/88888888/224/3221226947/1.m3u8?
 CCTV-15,https://xykt-fix.github.io/play/a02e/index.m3u8
-CCTV-15,http://[2409:8087:8:21::18]:6610/otttv.bj.chinamobile.com/PLTV/88888888/224/3221226333/1.m3u8?
 
 Kênh Hàn Quốc,#genre#
 
