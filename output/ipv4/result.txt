@@ -1,41 +1,33 @@
 🕘️更新时间,#genre#
-2026-05-23 00:04:12,http://74.91.26.218:82/live/cctv1hd.m3u8
+2026-05-23 00:11:58,http://74.91.26.218:82/live/cctv1hd.m3u8
 
-01. VTV - Kênh Quốc Gia,#genre#
+VTV,#genre#
 
-02. HTV - TP.HCM,#genre#
+HTV,#genre#
 
-03. Địa Phương - Miền Bắc,#genre#
+Địa phương,#genre#
 
-04. Địa Phương - Miền Trung,#genre#
+VTVcab,#genre#
 
-05. Địa Phương - Miền Nam,#genre#
+SCTV,#genre#
 
-06. VTVcab - Truyền Hình Cáp Việt Nam,#genre#
+K+,#genre#
 
-07. SCTV,#genre#
+FPT,#genre#
 
-08. FPT Play - FPT TV,#genre#
+Thể thao quốc tế,#genre#
 
-09. K Plus,#genre#
+Phim,#genre#
 
-10. Tin Tức - Thời Sự,#genre#
+Tin tức,#genre#
 
-11. Thể Thao Việt Nam,#genre#
+Thiếu nhi,#genre#
 
-12. Thể Thao Quốc Tế,#genre#
+Khoa học,#genre#
 
-13. Phim - Series,#genre#
+Âm nhạc,#genre#
 
-14. Giải Trí - Tổng Hợp,#genre#
-
-15. Thiếu Nhi - Giáo Dục,#genre#
-
-16. Khoa Học - Khám Phá,#genre#
-
-17. Âm Nhạc,#genre#
-
-18. Kênh Trung Quốc,#genre#
+Trung Quốc,#genre#
 CCTV-1,http://74.91.26.218:82/live/cctv1hd.m3u8
 CCTV-2,http://74.91.26.218:82/live/cctv2hd.m3u8
 CCTV-3,http://74.91.26.218:82/live/cctv3hd.m3u8
@@ -51,9 +43,7 @@ CCTV-13,http://74.91.26.218:82/live/cctv13hd.m3u8
 CCTV-14,http://74.91.26.218:82/live/cctv14hd.m3u8
 CCTV-15,http://74.91.26.218:82/live/cctv15hd.m3u8
 
-19. Kênh Quốc Tế,#genre#
-Arirang TV,https://liveh12.vtvprime.vn/hls/ARIRANG/03.m3u8
-Arirang TV,http://202.80.222.20/cdn/iptv/Tvod/001/channel2000034/1024.m3u8
+Quốc tế,#genre#
 KBS World,https://liveh12.vtvprime.vn/hls/KBS/03.m3u8
 
 ♻️未匹配频道,#genre#

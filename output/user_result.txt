@@ -1,49 +1,37 @@
 🕘️更新时间,#genre#
-2026-05-23 00:04:11,https://jmp2.uk/plu-6792044b680721c77c5b9ba2.m3u8
+2026-05-23 00:11:58,https://jmp2.uk/plu-60d3583ef310610007fb02b1.m3u8
 
-01. VTV - Kênh Quốc Gia,#genre#
+VTV,#genre#
 
-02. HTV - TP.HCM,#genre#
+HTV,#genre#
 
-03. Địa Phương - Miền Bắc,#genre#
+Địa phương,#genre#
 
-04. Địa Phương - Miền Trung,#genre#
+VTVcab,#genre#
 
-05. Địa Phương - Miền Nam,#genre#
+SCTV,#genre#
 
-06. VTVcab - Truyền Hình Cáp Việt Nam,#genre#
+K+,#genre#
 
-07. SCTV,#genre#
+FPT,#genre#
 
-08. FPT Play - FPT TV,#genre#
+Thể thao quốc tế,#genre#
 
-09. K Plus,#genre#
+Phim,#genre#
 
-10. Tin Tức - Thời Sự,#genre#
+Tin tức,#genre#
+Euronews,https://jmp2.uk/plu-60d3583ef310610007fb02b1.m3u8
+Euronews,https://jmp2.uk/plu-61b86ea479a4390007c6d5fc.m3u8
+Euronews,https://jmp2.uk/plu-61de8e502c8e9400077e5de7.m3u8
+Euronews,https://jmp2.uk/plu-61de90a47365340007f77c27.m3u8
 
-11. Thể Thao Việt Nam,#genre#
+Thiếu nhi,#genre#
 
-12. Thể Thao Quốc Tế,#genre#
-UFC,https://jmp2.uk/plu-6792044b680721c77c5b9ba2.m3u8
-UFC,https://jmp2.uk/plu-67921b873de7c8cf94233f52.m3u8
-UFC,https://jmp2.uk/plu-67921b78b83355184c667770.m3u8
-UFC,https://jmp2.uk/plu-679203d4bc03978b9b4b79a6.m3u8
-UFC,https://jmp2.uk/plu-679205a13de7c8cf941e7857.m3u8
-UFC,https://jmp2.uk/plu-6792066f3de7c8cf941e7ce3.m3u8
-UFC,https://jmp2.uk/plu-66ed3e9d5e4a6e0008b346e0.m3u8
-UFC,https://jmp2.uk/plu-677d9adfa9a51b0008497fa0.m3u8
+Khoa học,#genre#
 
-13. Phim - Series,#genre#
+Âm nhạc,#genre#
 
-14. Giải Trí - Tổng Hợp,#genre#
-
-15. Thiếu Nhi - Giáo Dục,#genre#
-
-16. Khoa Học - Khám Phá,#genre#
-
-17. Âm Nhạc,#genre#
-
-18. Kênh Trung Quốc,#genre#
+Trung Quốc,#genre#
 CCTV-1,http://74.91.26.218:82/live/cctv1hd.m3u8
 CCTV-2,http://74.91.26.218:82/live/cctv2hd.m3u8
 CCTV-3,http://74.91.26.218:82/live/cctv3hd.m3u8
@@ -54,25 +42,27 @@ CCTV-7,http://74.91.26.218:82/live/cctv7hd.m3u8
 CCTV-8,http://74.91.26.218:82/live/cctv8hd.m3u8
 CCTV-9,https://xykt-fix.github.io/Y77.m3u8
 CCTV-10,http://74.91.26.218:82/live/cctv10hd.m3u8
-CCTV-11,https://xykt-fix.github.io/play/a02b/index.m3u8
 CCTV-11,http://74.91.26.218:82/live/cctv11hd.m3u8
+CCTV-11,https://xykt-fix.github.io/play/a02b/index.m3u8
 CCTV-12,http://74.91.26.218:82/live/cctv12hd.m3u8
-CCTV-13,https://cdn3.163189.xyz/163189/cctv13
 CCTV-13,http://74.91.26.218:82/live/cctv13hd.m3u8
+CCTV-13,https://cdn3.163189.xyz/163189/cctv13
 CCTV-14,http://74.91.26.218:82/live/cctv14hd.m3u8
-CCTV-15,https://xykt-fix.github.io/play/a02e/index.m3u8
 CCTV-15,http://74.91.26.218:82/live/cctv15hd.m3u8
+CCTV-15,https://xykt-fix.github.io/play/a02e/index.m3u8
 
-19. Kênh Quốc Tế,#genre#
-Euronews,https://jmp2.uk/plu-60d3583ef310610007fb02b1.m3u8
-Euronews,https://jmp2.uk/plu-61b86ea479a4390007c6d5fc.m3u8
-Euronews,https://jmp2.uk/plu-61de8e502c8e9400077e5de7.m3u8
-Euronews,https://jmp2.uk/plu-61de90a47365340007f77c27.m3u8
-Arirang TV,https://liveh12.vtvprime.vn/hls/ARIRANG/03.m3u8
-Arirang TV,http://202.80.222.20/cdn/iptv/Tvod/001/channel2000034/1024.m3u8
+Quốc tế,#genre#
 KBS World,https://liveh12.vtvprime.vn/hls/KBS/03.m3u8
 
 ♻️未匹配频道,#genre#
+UFC,https://jmp2.uk/plu-6792044b680721c77c5b9ba2.m3u8
+UFC,https://jmp2.uk/plu-67921b873de7c8cf94233f52.m3u8
+UFC,https://jmp2.uk/plu-67921b78b83355184c667770.m3u8
+UFC,https://jmp2.uk/plu-679203d4bc03978b9b4b79a6.m3u8
+UFC,https://jmp2.uk/plu-679205a13de7c8cf941e7857.m3u8
+UFC,https://jmp2.uk/plu-6792066f3de7c8cf941e7ce3.m3u8
+UFC,https://jmp2.uk/plu-66ed3e9d5e4a6e0008b346e0.m3u8
+UFC,https://jmp2.uk/plu-677d9adfa9a51b0008497fa0.m3u8
 2GB Sydney (1080p),https://2gblive.akamaized.net/hls/live/2033805/2GB/index.m3u8
 3AW Melbourne (1080p),https://3awlive.akamaized.net/hls/live/2032295/3AW/index.m3u8
 3Cat Exclusiu 1 (1080p) [Geo-blocked],https://directes-tv-cat.3catdirectes.cat/live-content/oca1-hls/master.m3u8
@@ -5751,11 +5741,11 @@ AWSN (720p),https://jmp2.uk/plu-682e43b21295f98347710917.m3u8
 AWSN,https://jmp2.uk/plu-660e7404e8fba8000853abc0.m3u8
 AWSN,https://jmp2.uk/plu-660e7488aec9680008fabcf1.m3u8
 AWSN,https://jmp2.uk/plu-66fd37885049580008d295b6.m3u8
-Ax Men (720p),https://jmp2.uk/plu-6540fe4bbdf3cf0008aa2cdd.m3u8
 Ax Men (720p),https://36dc2f37.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/UmFrdXRlblRWLWdiX0F4TWVuX0hMUw/playlist.m3u8
 Ax Men (720p),https://bcadcc64.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/U2Ftc3VuZy1nYl9BeE1lbl9ITFM/playlist.m3u8
 Ax Men (720p),https://d3kx0b11i5yg0n.cloudfront.net/v1/aenetworks_axmen_1/samsungheadend_us/latest/main/hls/playlist.m3u8
 Ax Men (720p),https://live-manifest.production-public.tubi.io/live/b1fdb228-c169-48b3-b6a3-8dee2dd91839/playlist.m3u8
+Ax Men (720p),https://jmp2.uk/plu-6540fe4bbdf3cf0008aa2cdd.m3u8
 Ax Men Die Holzfäller (720p),https://jmp2.uk/plu-6914913274601d957ae35565.m3u8
 Axe Men (1080p),https://335e33e2.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/Um9rdV9BeE1lbl9ITFM/playlist.m3u8
 Axel!,https://jmp2.uk/plu-667d63d236a2f90008f72269.m3u8
@@ -5972,10 +5962,10 @@ Bloomberg TV Europe (720p),https://bloomberg.com/media-manifest/streams/eu.m3u8
 Bloomberg TV US Live Event (720p),https://bloomberg.com/media-manifest/streams/us-event.m3u8
 Bloomberg TV US Politics Live Event (720p),https://bloomberg.com/media-manifest/streams/politics.m3u8
 Bloomberg TV+ (720p),https://jmp2.uk/plu-61de991729cd4a00079f812b.m3u8
+Bloomberg TV+,https://86ebec83.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/UmFrdXRlblRWLWV1X0Jsb29tYmVyZ1RWUGx1c19ITFM/playlist.m3u8
 Bloomberg TV+,https://jmp2.uk/plu-62b976b93279cb000772c6f9.m3u8
 Bloomberg TV+,https://jmp2.uk/plu-61de8d4b8acf6c0007f1c2f3.m3u8
 Bloomberg TV+,https://jmp2.uk/plu-61de8fa251cca800076dde41.m3u8
-Bloomberg TV+,https://86ebec83.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/UmFrdXRlblRWLWV1X0Jsb29tYmVyZ1RWUGx1c19ITFM/playlist.m3u8
 Bloomberg TV+ (2160p),https://d8975dc3.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/U2Ftc3VuZy1nYl9CbG9vbWJlcmdUVlBsdXNfSExT/playlist.m3u8
 Bloomfield Access Government TV (480p),https://reflect-batv.cablecast.tv/live-3/live/live.m3u8
 Blue Bloods,https://jmp2.uk/plu-66f55a9a747bfa0008521859.m3u8
@@ -6491,12 +6481,12 @@ Cool Channel,https://live-iptv.cool-channel.com/cool/live-720P.m3u8
 Cool Summer Channel (720p),https://d2hzqddebd4oer.cloudfront.net/csts.m3u8
 Cool TV (1080p),http://146.59.85.40:89/coolhd/index.m3u8
 CooTel Nicaragua (1080p),http://138.117.4.70:8075/channel9/playlist.m3u8
+COPS,https://a7d6af1c184e465db4f39316a5181c1f.mediatailor.us-east-1.amazonaws.com/v1/master/0fb304b2320b25f067414d481a779b77db81760d/RakutenTV-eu_COPS/playlist.m3u8
 COPS,https://jmp2.uk/plu-6400bc50953da40008b94668.m3u8
 COPS,https://jmp2.uk/plu-6554bd45aa9ffb00088e5589.m3u8
 COPS,https://jmp2.uk/plu-6419ab7c9189ce000865a469.m3u8
 COPS,https://jmp2.uk/plu-6400bdb1219c4c00081751aa.m3u8
 COPS,https://jmp2.uk/plu-6400be67219c4c00081755d3.m3u8
-COPS,https://a7d6af1c184e465db4f39316a5181c1f.mediatailor.us-east-1.amazonaws.com/v1/master/0fb304b2320b25f067414d481a779b77db81760d/RakutenTV-eu_COPS/playlist.m3u8
 Cops (720p),https://langleyproductions-cops-2-eu.rakuten.wurl.tv/playlist.m3u8
 Cops & Docs (720p),https://d1si3n1st4nkgb.cloudfront.net/10502/88896053/hls/master.m3u8?ads.xumo_channelId=88896053
 Cops en Español (720p),https://rightsboosterltd-cops-1-es.rakuten.wurl.tv/playlist.m3u8
@@ -6984,13 +6974,13 @@ Extrema TV (720p),http://livestreamcdn.net:1935/ExtremaTV/ExtremaTV/playlist.m3u
 Extreme Makeover Home Edition,https://jmp2.uk/plu-6661739641af6400080cd8f1.m3u8
 F.B.I. Files,https://jmp2.uk/plu-64eddce19001910008df22b8.m3u8
 Fail Army (720p),https://bd93cfed.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/UmFrdXRlblRWLWV1X0ZhaWxBcm15X0hMUw/playlist.m3u8
+FailArmy (720p),https://failarmy-international-gb.samsung.wurl.tv/playlist.m3u8
 FailArmy (720p),https://jmp2.uk/plu-6177f6bf7693550007531275.m3u8
 FailArmy (720p),https://jmp2.uk/plu-5f1abf5fafb5ee0007d4d0ca.m3u8
 FailArmy (720p),https://jmp2.uk/plu-5f8ecd9169d2d4000864a974.m3u8
 FailArmy (720p),https://jmp2.uk/plu-608014d19a26320007c92ab6.m3u8
 FailArmy (720p),https://jmp2.uk/plu-5ebaccf1734aaf0007142c86.m3u8
 FailArmy (720p),https://jmp2.uk/plu-61781077929e930007c194ee.m3u8
-FailArmy (720p),https://failarmy-international-gb.samsung.wurl.tv/playlist.m3u8
 FailArmy,https://jmp2.uk/plu-62bdb5500c21270007218ce1.m3u8
 FailArmy,https://jmp2.uk/plu-6178037c35922000072a2ff5.m3u8
 FailArmy,https://jmp2.uk/plu-5f5141c1605ddf000748eb1b.m3u8
@@ -7005,8 +6995,8 @@ Familie Dr. Kleist,https://jmp2.uk/plu-65819f14b9adc4000813ee39.m3u8
 Familien fra Bryggen,https://jmp2.uk/plu-61c19c8c9863900007acaa57.m3u8
 Family Club (720p),https://jmp2.uk/plu-64c9260ac0222700089ee62b.m3u8
 Family Feud (1080p),https://amg00145-amg00145c23-samsung-gb-7654.playouts.now.amagi.tv/playlist.m3u8
-Family Feud (720p),https://jmp2.uk/plu-672e4d915534bb0008c50168.m3u8
 Family Feud (720p),https://aegis-cloudfront-1.tubi.video/e1638fe1-8df0-470a-9fa9-b515ca7ca18e/master.m3u8
+Family Feud (720p),https://jmp2.uk/plu-672e4d915534bb0008c50168.m3u8
 Family Feud Classic (1080p),https://amg00145-amg00145c3-xumo-us-3802.playouts.now.amagi.tv/playlist.m3u8
 Family Feud Classic (720p),https://jmp2.uk/plu-64c2222fb0cf5c0008288c4f.m3u8
 Family Feud Classic (720p),https://jmp2.uk/plu-643f03b9d8436e0008edf021.m3u8
@@ -7503,10 +7493,10 @@ I Love Lucy,https://jmp2.uk/plu-63a2f1dda0d69700078b7cba.m3u8
 I Love Lucy,https://jmp2.uk/plu-634f3011f4fff20007431641.m3u8
 I Puffi,https://jmp2.uk/plu-68adb5853efb41cd97ce413d.m3u8
 I soliti idioti,https://jmp2.uk/plu-6602acadb2abe500081cf28a.m3u8
-I Survived (720p),https://jmp2.uk/plu-6578852bcbd0d60008f876d7.m3u8
-I Survived (720p),https://jmp2.uk/plu-657887d9dfed030008ce8aa8.m3u8
 I Survived (720p),https://8e979536.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/UmFrdXRlblRWLWdiX0lTdXJ2aXZlZF9ITFM/playlist.m3u8
 I Survived (720p),https://a86a4e47.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/U2Ftc3VuZy1nYl9JU3Vydml2ZWRfSExT/playlist.m3u8
+I Survived (720p),https://jmp2.uk/plu-6578852bcbd0d60008f876d7.m3u8
+I Survived (720p),https://jmp2.uk/plu-657887d9dfed030008ce8aa8.m3u8
 I Survived,https://jmp2.uk/plu-657881c46e4f6a00087414c2.m3u8
 I Survived… (720p),https://d1ewp56x5c748d.cloudfront.net/v1/aenetworks_i_survived_1/samsungheadend_us/latest/main/hls/playlist.m3u8
 IBC Bakthi (1080p),https://ibc.massstream.net/IBC2/index.m3u8
@@ -7529,11 +7519,11 @@ Ice Pilots,https://jmp2.uk/plu-5ce40f42ba7f7f5ea9518fe1.m3u8
 Ice Pilots VIDAA TEST,https://jmp2.uk/plu-67d4586be979b84e78f064d0.m3u8
 Ice Road Truckers (1080p),https://3787c49a.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/Um9rdV9JY2VSb2FkVHJ1Y2tlcnNfSExT/playlist.m3u8
 Ice Road Truckers (1080p),https://aegis-cloudfront-1.tubi.video/f86823bb-d35d-4e5f-ab3e-ee0693dac9d4/playlist.m3u8
-Ice Road Truckers (720p),https://jmp2.uk/plu-657884cba620e30008fe33e1.m3u8
-Ice Road Truckers (720p),https://jmp2.uk/plu-62beb6c0371e6c000775930f.m3u8
 Ice Road Truckers (720p),https://6ffa57ba.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/UmFrdXRlblRWLWdiX0ljZVJvYWRUcnVja2Vyc19ITFM/playlist.m3u8
 Ice Road Truckers (720p),https://7aac8d7e.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/U2Ftc3VuZy1nYl9JY2VSb2FkVHJ1Y2tlcnNfSExT/playlist.m3u8
 Ice Road Truckers (720p),https://d27c7ivrw07fxl.cloudfront.net/v1/aenetworks_iceroadtruckers_1/samsungheadend_us/latest/main/hls/playlist.m3u8
+Ice Road Truckers (720p),https://jmp2.uk/plu-657884cba620e30008fe33e1.m3u8
+Ice Road Truckers (720p),https://jmp2.uk/plu-62beb6c0371e6c000775930f.m3u8
 Ice Road Truckers,https://jmp2.uk/plu-633560bfa693390008b99cf0.m3u8
 Ice Road Truckers,https://jmp2.uk/plu-68c8201b1e5aaf77c47d9605.m3u8
 Icel TV (720p) [Not 24/7],http://stream.taksimbilisim.com:1935/iceltv/bant1/playlist.m3u8
@@ -8210,10 +8200,10 @@ MO Channel (720p),https://cloudvideo.servers10.com:8081/8070/index.m3u8
 Mobile County Public Schools TV Network (MCPSS),https://5b200f5268ceb.streamlock.net/MCPSS/MCPSS247.smil/playlist.m3u8
 Moconomy,https://3ee905090d464be5a51478fd9c642e93.mediatailor.us-east-1.amazonaws.com/v1/master/44f73ba4d03e9607dcd9bebdcb8494d86964f1d8/RakutenTV-pl_Moconomy/playlist.m3u8
 Modern Marvels (1080p),https://277b8244.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/Um9rdV9Nb2Rlcm5NYXJ2ZWxzX0hMUw/playlist.m3u8
+Modern Marvels (720p),https://e5fd8762.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/U2Ftc3VuZy1nYl9Nb2Rlcm5NYXJ2ZWxzX0hMUw/playlist.m3u8
 Modern Marvels (720p),https://jmp2.uk/plu-6540ff2d770cf1000866b90a.m3u8
 Modern Marvels (720p),https://jmp2.uk/plu-6578812b12d5ee000884c5c6.m3u8
 Modern Marvels (720p),https://jmp2.uk/plu-6578878132c1b300089aa005.m3u8
-Modern Marvels (720p),https://e5fd8762.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/U2Ftc3VuZy1nYl9Nb2Rlcm5NYXJ2ZWxzX0hMUw/playlist.m3u8
 Modern Marvels,https://jmp2.uk/plu-657883cab228b700084414b3.m3u8
 Modern Marvels by HISTORY (720p),https://jmp2.uk/plu-65775d29dfed030008cb3db2.m3u8
 Modern Marvels Presented by History (720p) [Geo-blocked],https://pb-m89wlp8flmjzf.akamaized.net/v1/aenetworks_modernmarvels_1/samsungheadend_us/latest/main/hls/playlist.m3u8
@@ -8239,10 +8229,10 @@ Mojo TV (576p),https://mumt02.tangotv.in/MOJOTV/index.m3u8
 Mona The Vampire,https://jmp2.uk/plu-694178a8026be6e9d3ea7d7a.m3u8
 Monkey,https://jmp2.uk/plu-68e3c18130ee729844af1fca.m3u8
 Monroe County Television MCTV (Monroe County FL) (1080p),https://castus-vod-dev.s3.amazonaws.com/vod_clients/monroe/live/ch1/video.m3u8
+Monster Jam (720p),https://4b9627c7.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/UmFrdXRlblRWLWV1X01vbnN0ZXJKYW1fSExT/playlist.m3u8
 Monster Jam (720p),https://jmp2.uk/plu-65bcc9c8d77d450008b34c6b.m3u8
 Monster Jam (720p),https://jmp2.uk/plu-65c340383a116800078c8454.m3u8
 Monster Jam (720p),https://jmp2.uk/plu-65c340983ba51e00083988e8.m3u8
-Monster Jam (720p),https://4b9627c7.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/UmFrdXRlblRWLWV1X01vbnN0ZXJKYW1fSExT/playlist.m3u8
 Monster Jam,https://jmp2.uk/plu-65c33fd4dc10a40008f26af8.m3u8
 Monstruos de Rio,https://jmp2.uk/plu-66a92375cd0d31000847b219.m3u8
 Monte Carlo Digital Television (1080p),https://fl718492-exthls-p1.flovp.com/fl718492/live/live.m3u8
@@ -8721,8 +8711,8 @@ Persiana Medical,https://phd2hls.persiana.live/hls/stream.m3u8
 Persiana Plus,https://euhls.persiana.live/hls/stream.m3u8
 Persiana Series,https://onehls.persiana.live/hls/stream.m3u8
 PFL (720p),https://d2w9b8sam7j3zv.cloudfront.net/v1/pfl_pflmma_1/samsungheadend_us/latest/main/hls/playlist.m3u8
-PFL MMA (720p),https://jmp2.uk/plu-64f6163a30ab3300083d870e.m3u8
 PFL MMA (720p),https://a883593c.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/UmFrdXRlblRWLWV1X1BGTE1NQV9ITFM/playlist.m3u8
+PFL MMA (720p),https://jmp2.uk/plu-64f6163a30ab3300083d870e.m3u8
 PFL MMA,https://jmp2.uk/plu-64f6180130ab3300083d896b.m3u8
 PFL MMA,https://jmp2.uk/plu-65b8f959eb87e30008333201.m3u8
 PFL MMA,https://jmp2.uk/plu-65b8f87ac798e800085a123f.m3u8
@@ -10521,14 +10511,14 @@ The Ohio Channel (WVIZ DT-2) (720p),https://0888934ec1a5.us-east-1.playback.live
 The Osbournes (1080p),https://d1w2am5ftcgjx5.cloudfront.net/TheOsbournes_GB.m3u8
 The Outer Limits (720p),https://jmp2.uk/plu-6874ad743ffa5e0c917f6e20.m3u8
 The Parliamentary Channel (720p) [Not 24/7],https://zns-edge1.streamcomedia.cloud/abr_parliamentarychannel/abr-parliament_streams/playlist.m3u8
-The Pet Collective (720p),https://jmp2.uk/plu-5ebacbcae43a6d000787b88e.m3u8
-The Pet Collective (720p),https://jmp2.uk/plu-5f515ebac01c0f00080e8439.m3u8
 The Pet Collective (720p),https://6ec8627d.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/UmFrdXRlblRWLWV1X1RoZVBldENvbGxlY3RpdmVfSExT/playlist.m3u8
 The Pet Collective (720p),https://the-pet-collective-international-gb.samsung.wurl.tv/playlist.m3u8
-The Pet Collective,https://jmp2.uk/plu-62e92b5fca869f00078f0162.m3u8
+The Pet Collective (720p),https://jmp2.uk/plu-5ebacbcae43a6d000787b88e.m3u8
+The Pet Collective (720p),https://jmp2.uk/plu-5f515ebac01c0f00080e8439.m3u8
 The Pet Collective,https://the-pet-collective-international-in.samsung.wurl.tv/playlist.m3u8
 The Pet Collective,https://the-pet-collective-international-it.samsung.wurl.tv/playlist.m3u8
 The Pet Collective,https://the-pet-collective-international-es.samsung.wurl.tv/playlist.m3u8
+The Pet Collective,https://jmp2.uk/plu-62e92b5fca869f00078f0162.m3u8
 The Pet Collective (1080p) [Geo-blocked],https://pb-jc9emctsujawo.akamaized.net/playlist.m3u8
 The Pet Collective International (720p),https://the-pet-collective-international-au.samsung.wurl.tv/playlist.m3u8
 The Pet Collective International (720p),https://the-pet-collective-international-mx.samsung.wurl.tv/playlist.m3u8
@@ -11462,10 +11452,10 @@ Yuma77,https://securestream10.champds.com/LIVE/YumaCoAZLIVE/YumaCoAZLIVE.m3u8
 Yuma AZ CH 72 (1080p),https://livestream.telvue.com/yumaaz1/f7b44cfafd5c52223d5498196c8a2e7b.sdp/playlist.m3u8
 Yuma AZ CH 73 (1080p),https://livestream.telvue.com/yumaaz2/f7b44cfafd5c52223d5498196c8a2e7b.sdp/playlist.m3u8
 Z (Запорожье) (1080p),https://stream.ztv.zp.ua/hls/live.m3u8
+Z Nation,https://d39g1vxj2ef6in.cloudfront.net/v1/master/3fec3e5cac39a52b2132f9c66c83dae043dc17d4/prod-rakuten-stitched/master.m3u8?ads.xumo_channelId=88883098
 Z Nation,https://jmp2.uk/plu-66b3af48d2d50d00083d6936.m3u8
 Z Nation,https://jmp2.uk/plu-66b227b446762a000846c208.m3u8
 Z Nation,https://jmp2.uk/plu-66b3af1c3a4ad200081c7d03.m3u8
-Z Nation,https://d39g1vxj2ef6in.cloudfront.net/v1/master/3fec3e5cac39a52b2132f9c66c83dae043dc17d4/prod-rakuten-stitched/master.m3u8?ads.xumo_channelId=88883098
 Zabb Channel (720p),https://vdo.plathong.net/flash7057/flash7057/playlist.m3u8
 Zainabia Channel,https://zainabia.livebox.co.in/ZainabiaChannelhls/channel.m3u8
 Zalaegerszegi TV (360p),https://cloudfront44.lexanetwork.com:1344/freerelay/zegtv.sdp/playlist.m3u8

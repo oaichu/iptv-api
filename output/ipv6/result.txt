@@ -1,29 +1,45 @@
 🕘️更新时间,#genre#
-2026-05-23 00:04:12,https://jmp2.uk/plu-6792044b680721c77c5b9ba2.m3u8
+2026-05-23 00:11:59,https://jmp2.uk/plu-60d3583ef310610007fb02b1.m3u8
 
-01. VTV - Kênh Quốc Gia,#genre#
+VTV,#genre#
 
-02. HTV - TP.HCM,#genre#
+HTV,#genre#
 
-03. Địa Phương - Miền Bắc,#genre#
+Địa phương,#genre#
 
-04. Địa Phương - Miền Trung,#genre#
+VTVcab,#genre#
 
-05. Địa Phương - Miền Nam,#genre#
+SCTV,#genre#
 
-06. VTVcab - Truyền Hình Cáp Việt Nam,#genre#
+K+,#genre#
 
-07. SCTV,#genre#
+FPT,#genre#
 
-08. FPT Play - FPT TV,#genre#
+Thể thao quốc tế,#genre#
 
-09. K Plus,#genre#
+Phim,#genre#
 
-10. Tin Tức - Thời Sự,#genre#
+Tin tức,#genre#
+Euronews,https://jmp2.uk/plu-60d3583ef310610007fb02b1.m3u8
+Euronews,https://jmp2.uk/plu-61b86ea479a4390007c6d5fc.m3u8
+Euronews,https://jmp2.uk/plu-61de8e502c8e9400077e5de7.m3u8
+Euronews,https://jmp2.uk/plu-61de90a47365340007f77c27.m3u8
 
-11. Thể Thao Việt Nam,#genre#
+Thiếu nhi,#genre#
 
-12. Thể Thao Quốc Tế,#genre#
+Khoa học,#genre#
+
+Âm nhạc,#genre#
+
+Trung Quốc,#genre#
+CCTV-9,https://xykt-fix.github.io/Y77.m3u8
+CCTV-11,https://xykt-fix.github.io/play/a02b/index.m3u8
+CCTV-13,https://cdn3.163189.xyz/163189/cctv13
+CCTV-15,https://xykt-fix.github.io/play/a02e/index.m3u8
+
+Quốc tế,#genre#
+
+♻️未匹配频道,#genre#
 UFC,https://jmp2.uk/plu-6792044b680721c77c5b9ba2.m3u8
 UFC,https://jmp2.uk/plu-67921b873de7c8cf94233f52.m3u8
 UFC,https://jmp2.uk/plu-67921b78b83355184c667770.m3u8
@@ -32,30 +48,6 @@ UFC,https://jmp2.uk/plu-679205a13de7c8cf941e7857.m3u8
 UFC,https://jmp2.uk/plu-6792066f3de7c8cf941e7ce3.m3u8
 UFC,https://jmp2.uk/plu-66ed3e9d5e4a6e0008b346e0.m3u8
 UFC,https://jmp2.uk/plu-677d9adfa9a51b0008497fa0.m3u8
-
-13. Phim - Series,#genre#
-
-14. Giải Trí - Tổng Hợp,#genre#
-
-15. Thiếu Nhi - Giáo Dục,#genre#
-
-16. Khoa Học - Khám Phá,#genre#
-
-17. Âm Nhạc,#genre#
-
-18. Kênh Trung Quốc,#genre#
-CCTV-9,https://xykt-fix.github.io/Y77.m3u8
-CCTV-11,https://xykt-fix.github.io/play/a02b/index.m3u8
-CCTV-13,https://cdn3.163189.xyz/163189/cctv13
-CCTV-15,https://xykt-fix.github.io/play/a02e/index.m3u8
-
-19. Kênh Quốc Tế,#genre#
-Euronews,https://jmp2.uk/plu-60d3583ef310610007fb02b1.m3u8
-Euronews,https://jmp2.uk/plu-61b86ea479a4390007c6d5fc.m3u8
-Euronews,https://jmp2.uk/plu-61de8e502c8e9400077e5de7.m3u8
-Euronews,https://jmp2.uk/plu-61de90a47365340007f77c27.m3u8
-
-♻️未匹配频道,#genre#
 CBS News 24/7 (720p),https://jmp2.uk/plu-6231ede1be5b460007f91bc1.m3u8
 CBS News 24/7 (720p),https://jmp2.uk/plu-6231ec93779a9d00079ba8e2.m3u8
 CBS News 24/7 (720p),https://jmp2.uk/plu-6231ec4b62cd1f0007093c7b.m3u8
