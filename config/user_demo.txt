@@ -1,4 +1,4 @@
-VTV - Kênh Quốc Gia,#genre#
+01. VTV - Kênh Quốc Gia,#genre#
 VTV1
 VTV1 HD
 VTV2
@@ -21,7 +21,7 @@ VTV9
 VTV9 HD
 VTV10
 
-HTV - TP.HCM,#genre#
+02. HTV - TP.HCM,#genre#
 HTV1
 HTV2
 HTV3
@@ -31,6 +31,7 @@ HTV7 HD
 HTV9
 HTV9 HD
 HTV Thể Thao
+HTV Sports
 HTV Key
 HTVC Gia Đình
 HTVC Phim
@@ -39,13 +40,15 @@ HTVC Ca Nhạc
 HTVC Du Lịch Cuộc Sống
 HTVC Phụ Nữ
 
-Địa Phương - Miền Bắc,#genre#
+03. Địa Phương - Miền Bắc,#genre#
 Hà Nội 1
 Hà Nội 2
 Hanoi TV1
 Hanoi TV2
 THP Hải Phòng
+Hải Phòng TV
 QTV Quảng Ninh
+Quảng Ninh TV
 Bắc Ninh TV
 Bắc Giang TV
 Hải Dương TV
@@ -55,6 +58,7 @@ Nam Định TV
 Ninh Bình TV
 Thanh Hóa TV
 Nghệ An TV
+NTV Nghệ An
 Hà Tĩnh TV
 Tuyên Quang TV
 Lào Cai TV
@@ -69,27 +73,39 @@ Lai Châu TV
 Sơn La TV
 Hòa Bình TV
 
-Địa Phương - Miền Trung,#genre#
+04. Địa Phương - Miền Trung,#genre#
 Quảng Bình TV
 Quảng Trị TV
 TRT Huế
+Huế TV
 Đà Nẵng TV
+DRT Đà Nẵng
 Quảng Nam TV
+QRT Quảng Nam
 Quảng Ngãi TV
+PTQ Quảng Ngãi
 Bình Định TV
+BTV Bình Định
 Phú Yên TV
 Khánh Hòa TV
+KTV Khánh Hòa
 Ninh Thuận TV
 Bình Thuận TV
+BTV Bình Thuận
 Kon Tum TV
 Gia Lai TV
+THGL
 Đắk Lắk TV
+DRT Đắk Lắk
 Đắk Nông TV
 Lâm Đồng TV
+LTV Lâm Đồng
 
-Địa Phương - Miền Nam,#genre#
+05. Địa Phương - Miền Nam,#genre#
 BTV Bình Dương
+Bình Dương TV
 Đồng Nai TV
+DNRTV
 Bà Rịa Vũng Tàu TV
 BRT
 Long An TV
@@ -105,6 +121,7 @@ THVL3
 THVL4
 Đồng Tháp TV
 THĐT
+THDT
 An Giang TV
 THAG
 Kiên Giang TV
@@ -112,13 +129,19 @@ THKG
 Cần Thơ TV
 THTPCT
 Hậu Giang TV
+HGTV
 Sóc Trăng TV
+STV
 Bạc Liêu TV
+BLTV
 Cà Mau TV
+CTV Cà Mau
 Tây Ninh TV
+TTV11 Tây Ninh
 Bình Phước TV
+BPTV
 
-VTVcab - Truyền Hình Cáp Việt Nam,#genre#
+06. VTVcab - Truyền Hình Cáp Việt Nam,#genre#
 VTVcab 1
 VTVcab 2
 VTVcab 3
@@ -149,7 +172,7 @@ ON Cine
 ON Trending
 ON E Channel
 
-SCTV,#genre#
+07. SCTV,#genre#
 SCTV1
 SCTV2
 SCTV3
@@ -173,34 +196,42 @@ SCTV20
 SCTV Phim Tổng Hợp
 SCTV Phim Việt
 SCTV Thể Thao
+SCTV Sports
 SCTV Ca Nhạc
 SCTV Thiếu Nhi
 
-FPT Play - FPT TV,#genre#
+08. FPT Play - FPT TV,#genre#
 FPT Play
 FPT Play Box
+FPT TV
+FPT Play HD
+
+09. K Plus,#genre#
 K+
 K+ Sport 1
 K+ Sport 2
+K+ Sports 1
+K+ Sports 2
 K+ Cine
 K+ Life
 K+ Kids
 K+ Action
 K+ NS
 K+ PM
+KPlus
+KPlus Sport
 
-Tin Tức - Thời Sự,#genre#
-VTV1
-VTV4
-VTV8
-VTV9
-Thông Tấn Xã Việt Nam
+10. Tin Tức - Thời Sự,#genre#
 VNews
+Thông Tấn Xã Việt Nam
 Quốc Hội TV
 Nhân Dân TV
 ANTV
 QPVN
+Vietnam News
 CNN
+CNN International
+BBC World
 BBC World News
 France 24
 DW
@@ -208,24 +239,33 @@ Euronews
 Al Jazeera
 CNBC
 Bloomberg
+CNA
+Channel News Asia
+NHK World
+Arirang TV
 
-Thể Thao Việt Nam,#genre#
+11. Thể Thao Việt Nam,#genre#
 VTV3
 VTV6
 HTV Thể Thao
+HTV Sports
 ON Sports
 ON Sports News
 ON Football
 ON Golf
 SCTV Thể Thao
+SCTV Sports
 Bóng Đá TV
 Thể Thao TV
 K+ Sport 1
 K+ Sport 2
+K+ Sports 1
+K+ Sports 2
 
-Thể Thao Quốc Tế,#genre#
+12. Thể Thao Quốc Tế,#genre#
 ESPN
 ESPN 2
+ESPN News
 Fox Sports
 Fox Sports 2
 Sky Sports
@@ -260,9 +300,12 @@ Fight Sports
 Sport TV
 SuperSport
 
-Phim - Series,#genre#
+13. Phim - Series,#genre#
 HBO
 HBO HD
+HBO Hits
+HBO Family
+HBO Signature
 Cinemax
 Star Movies
 AXN
@@ -279,7 +322,7 @@ HTVC Phim
 K+ Cine
 K+ Action
 
-Giải Trí - Tổng Hợp,#genre#
+14. Giải Trí - Tổng Hợp,#genre#
 VTV3
 HTV7
 HTV9
@@ -294,8 +337,10 @@ ON Trending
 SCTV6
 SCTV7
 SCTV13
+Entertainment
+General
 
-Thiếu Nhi - Giáo Dục,#genre#
+15. Thiếu Nhi - Giáo Dục,#genre#
 VTV7
 HTV3
 ON Kids
@@ -304,12 +349,14 @@ Cartoon Network
 Disney Channel
 Disney Junior
 Nickelodeon
+Nick Jr
 Baby TV
 CBeebies
 Da Vinci
 Discovery Kids
+Kids
 
-Khoa Học - Khám Phá,#genre#
+16. Khoa Học - Khám Phá,#genre#
 Discovery
 Discovery Channel
 Discovery Science
@@ -320,8 +367,9 @@ History
 BBC Earth
 TLC
 Travel Channel
+Science
 
-Âm Nhạc,#genre#
+17. Âm Nhạc,#genre#
 MTV
 MTV Live
 Channel V
@@ -330,8 +378,9 @@ HTVC Ca Nhạc
 SCTV Ca Nhạc
 iTV
 Yeah1 Music
+Music
 
-Kênh Trung Quốc,#genre#
+18. Kênh Trung Quốc,#genre#
 CCTV-1
 CCTV-2
 CCTV-3
@@ -361,7 +410,7 @@ Guangdong TV
 Beijing TV
 Shanghai TV
 
-Kênh Quốc Tế,#genre#
+19. Kênh Quốc Tế,#genre#
 CNN
 CNN International
 BBC World
@@ -389,4 +438,4 @@ CBS News
 NBC News
 Fox News
 
-Kênh Lỗi - Không Chạy,#genre#
+20. Kênh Chưa Phân Loại,#genre#
