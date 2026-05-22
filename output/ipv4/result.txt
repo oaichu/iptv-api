@@ -1,16 +1,52 @@
 🕘️更新时间,#genre#
-2026-05-23 00:02:12,http://74.91.26.218:82/live/cctv1hd.m3u8$订阅源
+2026-05-23 00:11:50,http://74.91.26.218:82/live/cctv1hd.m3u8$订阅源
 
-Kenh Viet Nam,#genre#
+VTV - Kênh Quốc Gia,#genre#
 
-Kenh Trung Quoc,#genre#
+HTV - TP.HCM,#genre#
+
+Địa Phương - Miền Bắc,#genre#
+
+Địa Phương - Miền Trung,#genre#
+
+Địa Phương - Miền Nam,#genre#
+
+VTVcab - Truyền Hình Cáp Việt Nam,#genre#
+
+SCTV,#genre#
+
+FPT Play - FPT TV,#genre#
+
+Tin Tức - Thời Sự,#genre#
+
+Thể Thao Việt Nam,#genre#
+
+Thể Thao Quốc Tế,#genre#
+
+Phim - Series,#genre#
+
+Giải Trí - Tổng Hợp,#genre#
+
+Thiếu Nhi - Giáo Dục,#genre#
+
+Khoa Học - Khám Phá,#genre#
+
+Âm Nhạc,#genre#
+
+Kênh Trung Quốc,#genre#
 CCTV-1,http://74.91.26.218:82/live/cctv1hd.m3u8$订阅源
 CCTV-2,http://74.91.26.218:82/live/cctv2hd.m3u8$订阅源
 CCTV-3,http://74.91.26.218:82/live/cctv3hd.m3u8$订阅源
 CCTV-4,http://74.91.26.218:82/live/cctv4hd.m3u8$订阅源
 CCTV-5,http://74.91.26.218:82/live/cctv5hd.m3u8$订阅源
+CCTV-5+,http://192.151.150.154/live/cctv5p.m3u8$订阅源
 CCTV-7,http://74.91.26.218:82/live/cctv7hd.m3u8$订阅源
 CCTV-8,http://74.91.26.218:82/live/cctv8hd.m3u8$订阅源
+CCTV-10,http://74.91.26.218:82/live/cctv10hd.m3u8$订阅源
+CCTV-11,http://74.91.26.218:82/live/cctv11hd.m3u8$订阅源
+CCTV-12,http://74.91.26.218:82/live/cctv12hd.m3u8$订阅源
 CCTV-13,http://74.91.26.218:82/live/cctv13hd.m3u8$订阅源
+CCTV-14,http://74.91.26.218:82/live/cctv14hd.m3u8$订阅源
+CCTV-15,http://74.91.26.218:82/live/cctv15hd.m3u8$订阅源
 
-Kenh Quoc Te,#genre#
+Kênh Quốc Tế,#genre#

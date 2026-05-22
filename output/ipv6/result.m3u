@@ -1,5 +1,11 @@
 #EXTM3U x-tvg-url="https://raw.githubusercontent.com/oaichu/iptv-api/refs/heads/master/output/epg/epg.gz"
-#EXTINF:-1 tvg-id="VTV1" tvg-name="VTV1" tvg-logo="http://10.1.0.133:5180/logo/VTV1.png" group-title="🕘️更新时间",2026-05-23 00:02:12
+#EXTINF:-1 tvg-id="VTV1" tvg-name="VTV1" tvg-logo="http://10.1.0.237:5180/logo/VTV1.png" group-title="🕘️更新时间",2026-05-23 00:11:50
+https://xykt-fix.github.io/Y77.m3u8$订阅源
+#EXTINF:-1 tvg-id="CCTV-9" tvg-name="CCTV-9" tvg-logo="http://10.1.0.237:5180/logo/CCTV-9.png" group-title="Kênh Trung Quốc",CCTV-9
+https://xykt-fix.github.io/Y77.m3u8$订阅源
+#EXTINF:-1 tvg-id="CCTV-11" tvg-name="CCTV-11" tvg-logo="http://10.1.0.237:5180/logo/CCTV-11.png" group-title="Kênh Trung Quốc",CCTV-11
+https://xykt-fix.github.io/play/a02b/index.m3u8$订阅源
+#EXTINF:-1 tvg-id="CCTV-13" tvg-name="CCTV-13" tvg-logo="http://10.1.0.237:5180/logo/CCTV-13.png" group-title="Kênh Trung Quốc",CCTV-13
 https://cdn3.163189.xyz/163189/cctv13$订阅源
-#EXTINF:-1 tvg-id="CCTV-13" tvg-name="CCTV-13" tvg-logo="http://10.1.0.133:5180/logo/CCTV-13.png" group-title="Kenh Trung Quoc",CCTV-13
-https://cdn3.163189.xyz/163189/cctv13$订阅源
+#EXTINF:-1 tvg-id="CCTV-15" tvg-name="CCTV-15" tvg-logo="http://10.1.0.237:5180/logo/CCTV-15.png" group-title="Kênh Trung Quốc",CCTV-15
+https://xykt-fix.github.io/play/a02e/index.m3u8$订阅源
